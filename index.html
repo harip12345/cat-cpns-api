@@ -1110,9 +1110,17 @@ function hideLoading() {
    Ganti BASE_URL dengan URL Vercel Anda
 ============================================================== */
 const BASE_URL   = 'https://cat-cpns-9rgbflxye-haripamungkas519.vercel.app'; // ← URL Vercel Anda
+// Jumlah soal sesuai standar BKN resmi
+// Setiap subtest di-generate dalam batch 10 soal (aman dari timeout Vercel)
 const SOAL_CONFIG = {
-  skd: { subtests: ['TWK', 'TIU', 'TKP'] },
-  skb: { subtests: ['SKB'] },
+  skd: {
+    TWK: { total: 30, batch: 10 },  // 3 request × 10 soal
+    TIU: { total: 35, batch: 10 },  // 4 request × 10 soal (terakhir 5)
+    TKP: { total: 45, batch: 10 },  // 5 request × 10 soal (terakhir 5)
+  },
+  skb: {
+    SKB: { total: 100, batch: 10 }, // 10 request × 10 soal
+  },
 };
 
 /* ==============================================================
@@ -1138,37 +1146,47 @@ const LOADING_MESSAGES = {
 };
 
 /* ==============================================================
-   FETCH DARI VERCEL BACKEND — satu request per subtest
+   FETCH DARI VERCEL BACKEND — batch per 10 soal, tidak timeout
+   Soal SKD: 110 total (30 TWK + 35 TIU + 45 TKP)
+   Soal SKB: 100 total
    API key tersimpan aman di environment variable Vercel.
-   Setiap request selesai <15 detik, tidak ada timeout.
 ============================================================== */
 async function fetchFromAPI(examType) {
-  const config   = SOAL_CONFIG[examType];
-  const subtests = config.subtests;
+  const config     = SOAL_CONFIG[examType];
   const allQuestions = [];
-  let globalId = 1;
+  let globalId     = 1;
 
-  for (const subtest of subtests) {
-    updateLoadingMsg(`Menyusun soal ${subtest}...`);
+  for (const [subtest, cfg] of Object.entries(config)) {
+    const { total, batch } = cfg;
+    let collected = 0;
+    let batchNum  = 1;
+    const totalBatches = Math.ceil(total / batch);
 
-    const res = await fetch(BASE_URL + '/api/soal', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ examType, subtest }),
-    });
+    while (collected < total) {
+      const count = Math.min(batch, total - collected);
+      updateLoadingMsg(`Menyusun soal ${subtest} (${batchNum}/${totalBatches})...`);
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(`API error ${res.status}: ${err.error || res.statusText}`);
+      const res = await fetch(BASE_URL + '/api/soal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ examType, subtest, count }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`API error ${res.status}: ${err.error || res.statusText}`);
+      }
+
+      const data = await res.json();
+      if (!data.success || !Array.isArray(data.questions)) {
+        throw new Error(`Response tidak valid untuk ${subtest} batch ${batchNum}.`);
+      }
+
+      data.questions.forEach(q => { q.id = globalId++; });
+      allQuestions.push(...data.questions);
+      collected += data.questions.length;
+      batchNum++;
     }
-
-    const data = await res.json();
-    if (!data.success || !Array.isArray(data.questions)) {
-      throw new Error(`Response tidak valid untuk subtest ${subtest}.`);
-    }
-
-    data.questions.forEach(q => { q.id = globalId++; });
-    allQuestions.push(...data.questions);
   }
 
   return allQuestions;
