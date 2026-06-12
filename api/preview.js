@@ -26,7 +26,7 @@ const VALID_SUBTESTS = {
   skb: ['SKB'],
 };
 
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+const DEFAULT_MODEL = 'llama-3.1-8b-instant';
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;

@@ -10,13 +10,13 @@ const {
 const { SYSTEM_PROMPTS, buildUserPrompt } = require('../lib/prompts');
 
 const SOAL_CONFIG = {
-  skd: { TWK: 10, TIU: 12, TKP: 13 },
-  skb: { SKB: 20 },
+  skd: { TWK: 5, TIU: 5, TKP: 5 },
+  skb: { SKB: 10 },
 };
 
 // Batch besar = sedikit round-trip = lebih cepat
 const BATCH_SIZE = 10;
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+const DEFAULT_MODEL = 'llama-3.1-8b-instant';
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
