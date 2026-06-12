@@ -688,6 +688,33 @@
     .btn-modal-cancel { flex: 1; padding: 10px; background: var(--bkn-light); border: 1.5px solid var(--bkn-border); border-radius: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer; }
     .btn-modal-confirm { flex: 1; padding: 10px; background: var(--bkn-red); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
 
+
+    /* Generate baru button & source badge */
+    .btn-generate-new {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: white;
+      border: 2px solid var(--bkn-blue2);
+      color: var(--bkn-blue2);
+      border-radius: 8px; padding: 8px 16px;
+      font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s;
+      margin-top: 10px;
+    }
+    .btn-generate-new:hover { background: var(--bkn-blue2); color: white; }
+    .btn-generate-new:disabled { opacity: 0.45; cursor: not-allowed; }
+    .source-badge {
+      display: inline-block; border-radius: 20px;
+      padding: 3px 10px; font-size: 0.72rem; font-weight: 700;
+      margin-left: 8px; vertical-align: middle;
+    }
+    .source-badge.cache     { background: #d4f4e2; color: var(--bkn-green); }
+    .source-badge.generated { background: #e8f0fe; color: var(--bkn-blue2); }
+    .exam-card-footer {
+      padding: 12px 24px;
+      border-top: 1px solid var(--bkn-border);
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .cache-info { font-size: 0.78rem; color: var(--text-sub); }
     /* =========================================================
        RESPONSIVE
     ========================================================= */
@@ -820,7 +847,13 @@
             <span class="subtest-tag">TIU — 35 soal</span>
             <span class="subtest-tag">TKP — 45 soal</span>
           </div>
-          <button class="btn-start">▶ Mulai Simulasi SKD</button>
+          <button class="btn-start" onclick="startExam('skd', false)">▶ Mulai Simulasi SKD</button>
+          <div class="exam-card-footer">
+            <span class="cache-info" id="cache-info-skd">Soal dari cache jika tersedia</span>
+            <button class="btn-generate-new" id="btn-new-skd" onclick="startExam('skd', true)">
+              🔄 Generate Soal Baru
+            </button>
+          </div>
         </div>
       </div>
 
@@ -841,7 +874,13 @@
             <span class="subtest-tag">Kompetensi Teknis</span>
             <span class="subtest-tag">Jabatan Fungsional</span>
           </div>
-          <button class="btn-start">▶ Mulai Simulasi SKB</button>
+          <button class="btn-start skb-start" onclick="startExam('skb', false)">▶ Mulai Simulasi SKB</button>
+          <div class="exam-card-footer">
+            <span class="cache-info" id="cache-info-skb">Soal dari cache jika tersedia</span>
+            <button class="btn-generate-new" id="btn-new-skb" onclick="startExam('skb', true)">
+              🔄 Generate Soal Baru
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1110,16 +1149,15 @@ function hideLoading() {
    Ganti BASE_URL dengan URL Vercel Anda
 ============================================================== */
 const BASE_URL   = 'https://cat-cpns-9rgbflxye-haripamungkas519.vercel.app'; // ← URL Vercel Anda
-// Jumlah soal sesuai standar BKN resmi
-// Setiap subtest di-generate dalam batch 10 soal (aman dari timeout Vercel)
+// Jumlah soal sesuai standar BKN resmi — di-generate per batch 10 soal
 const SOAL_CONFIG = {
   skd: {
-    TWK: { total: 30, batch: 10 },  // 3 request × 10 soal
-    TIU: { total: 35, batch: 10 },  // 4 request × 10 soal (terakhir 5)
-    TKP: { total: 45, batch: 10 },  // 5 request × 10 soal (terakhir 5)
+    TWK: { total: 30, batch: 10 },
+    TIU: { total: 35, batch: 10 },
+    TKP: { total: 45, batch: 10 },
   },
   skb: {
-    SKB: { total: 100, batch: 10 }, // 10 request × 10 soal
+    SKB: { total: 100, batch: 10 },
   },
 };
 
@@ -1146,30 +1184,27 @@ const LOADING_MESSAGES = {
 };
 
 /* ==============================================================
-   FETCH DARI VERCEL BACKEND — batch per 10 soal, tidak timeout
-   Soal SKD: 110 total (30 TWK + 35 TIU + 45 TKP)
-   Soal SKB: 100 total
-   API key tersimpan aman di environment variable Vercel.
+   FETCH DARI VERCEL BACKEND — batch per 10 soal, dengan cache Firebase
 ============================================================== */
-async function fetchFromAPI(examType) {
-  const config     = SOAL_CONFIG[examType];
+async function fetchFromAPI(examType, forceNew = false) {
+  const config       = SOAL_CONFIG[examType];
   const allQuestions = [];
-  let globalId     = 1;
+  let   globalId     = 1;
 
   for (const [subtest, cfg] of Object.entries(config)) {
     const { total, batch } = cfg;
-    let collected = 0;
-    let batchNum  = 1;
+    let collected   = 0;
+    let batchIndex  = 0;
     const totalBatches = Math.ceil(total / batch);
 
     while (collected < total) {
       const count = Math.min(batch, total - collected);
-      updateLoadingMsg(`Menyusun soal ${subtest} (${batchNum}/${totalBatches})...`);
+      updateLoadingMsg(`Menyusun soal ${subtest} (${batchIndex + 1}/${totalBatches})...`);
 
       const res = await fetch(BASE_URL + '/api/soal', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ examType, subtest, count }),
+        body:    JSON.stringify({ examType, subtest, count, batchIndex, forceNew }),
       });
 
       if (!res.ok) {
@@ -1179,13 +1214,15 @@ async function fetchFromAPI(examType) {
 
       const data = await res.json();
       if (!data.success || !Array.isArray(data.questions)) {
-        throw new Error(`Response tidak valid untuk ${subtest} batch ${batchNum}.`);
+        throw new Error(`Response tidak valid untuk ${subtest} batch ${batchIndex}.`);
       }
 
+      // Simpan source (cache/generated) dari response pertama
+      if (batchIndex === 0) window._lastSource = data.source || 'generated';
       data.questions.forEach(q => { q.id = globalId++; });
       allQuestions.push(...data.questions);
       collected += data.questions.length;
-      batchNum++;
+      batchIndex++;
     }
   }
 
@@ -1408,8 +1445,14 @@ async function loadMockData(examType) {
 /* ==============================================================
    START EXAM — Fungsi utama memulai ujian
 ============================================================== */
-async function startExam(examType) {
-  // Mulai loading dengan pesan berputar
+async function startExam(examType, forceNew = false) {
+  // Disable tombol agar tidak double-click
+  ['btn-new-skd','btn-new-skb'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  const cacheInfoEl = document.getElementById('cache-info-' + examType);
+
   showLoading('Menghubungi server AI...');
   const msgInterval = startLoadingMessages(examType);
 
@@ -1418,7 +1461,7 @@ async function startExam(examType) {
 
     // Ambil soal langsung dari Groq (browser → Groq API)
     try {
-      questions = await fetchFromAPI(examType);
+      questions = await fetchFromAPI(examType, forceNew);
     } catch (apiErr) {
       console.warn('Groq gagal, fallback ke mock:', apiErr.message);
       updateLoadingMsg('Menggunakan soal cadangan...');
@@ -1438,6 +1481,17 @@ async function startExam(examType) {
     // Set timer
     state.timeLeft = examType === 'skd' ? 100 * 60 : 90 * 60;
 
+    // Update cache info label
+    if (cacheInfoEl) {
+      const src = window._lastSource || 'cache';
+      cacheInfoEl.innerHTML = src === 'cache'
+        ? '✅ Soal dari cache <span class="source-badge cache">Cache</span>'
+        : '✨ Soal baru di-generate AI <span class="source-badge generated">Baru</span>';
+    }
+    ['btn-new-skd','btn-new-skb'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
     hideLoading();
     showView('ujian');
     renderExamHeader();
@@ -1447,6 +1501,10 @@ async function startExam(examType) {
 
   } catch (err) {
     clearInterval(msgInterval);
+    ['btn-new-skd','btn-new-skb'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
     hideLoading();
     alert(
       '❌ Gagal memuat data soal.\n\n' +
