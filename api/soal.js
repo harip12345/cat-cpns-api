@@ -1,3 +1,6 @@
+// api/soal.js — POST /api/soal
+// Self-contained: semua helper inline, hanya butuh groq-sdk dari package.json
+
 const Groq = require('groq-sdk');
 
 // ─── CORS ────────────────────────────────────────────────────
