@@ -25,25 +25,25 @@ const PROMPTS = {
 Buat soal pilihan ganda berkualitas tinggi tentang: Pancasila, UUD 1945, NKRI, Bhinneka Tunggal Ika, sejarah kemerdekaan, sistem pemerintahan Indonesia. Referensi materi CPNS 2024-2025.
 Aturan: satu jawaban benar objektif, 4 pengecoh masuk akal, bahasa Indonesia baku, referensi akurat, topik bervariasi tidak mengulang.
 Output HANYA array JSON (tanpa markdown, tanpa komentar, tanpa teks lain):
-[{"id":1,"subtest":"TWK","subtestFull":"Tes Wawasan Kebangsaan","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"B","nilai":{"benar":5,"salah":0}}]`,
+[{"id":1,"subtest":"TWK","subtestFull":"Tes Wawasan Kebangsaan","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"B","pembahasanSingkat":"Penjelasan mengapa B benar...","referensi":"Pasal X UUD 1945","nilai":{"benar":5,"salah":0}}]`,
 
   TIU: `Anda adalah pembuat soal CAT CPNS ahli untuk Tes Intelejensi Umum (TIU).
 Buat soal untuk: analogi kata, sinonim/antonim (KBBI), deret angka, aritmatika (jual-beli, kecepatan, persentase), silogisme. Referensi materi CPNS 2024-2025.
 Aturan: hitung ulang semua jawaban numerik, satu jawaban benar, pengecoh dekat jawaban benar, bisa dikerjakan tanpa kalkulator dalam 2 menit, variasikan tipe soal.
 Output HANYA array JSON (tanpa markdown, tanpa komentar, tanpa teks lain):
-[{"id":1,"subtest":"TIU","subtestFull":"Tes Intelejensi Umum","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"C","nilai":{"benar":5,"salah":0}}]`,
+[{"id":1,"subtest":"TIU","subtestFull":"Tes Intelejensi Umum","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"C","pembahasanSingkat":"Langkah penyelesaian: ... hasilnya C karena ...","nilai":{"benar":5,"salah":0}}]`,
 
   TKP: `Anda adalah pembuat soal CAT CPNS ahli untuk Tes Karakteristik Pribadi (TKP).
 Buat skenario situasional ASN yang mengukur: pelayanan publik, integritas, kerja tim, inovasi, profesionalisme. Referensi materi CPNS 2024-2025.
 Aturan KETAT: semua 5 opsi masuk akal (tidak ada yang jelas salah/bodoh), distribusi skor {1,2,3,4,5} masing-masing TEPAT SATU opsi (tidak boleh ada nilai sama), skenario realistis di kantor pemerintahan.
 Output HANYA array JSON (tanpa markdown, tanpa komentar, tanpa teks lain):
-[{"id":1,"subtest":"TKP","subtestFull":"Tes Karakteristik Pribadi","tipe":"tkp","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"nilaiOpsi":{"A":3,"B":5,"C":1,"D":4,"E":2}}]`,
+[{"id":1,"subtest":"TKP","subtestFull":"Tes Karakteristik Pribadi","tipe":"tkp","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"nilaiOpsi":{"A":3,"B":5,"C":1,"D":4,"E":2},"alasanSkor":{"A":"alasan skor 3...","B":"alasan skor 5...","C":"alasan skor 1...","D":"alasan skor 4...","E":"alasan skor 2..."}}]`,
 
   SKB: `Anda adalah pembuat soal CAT CPNS ahli untuk SKB formasi Akuntansi (Analis Keuangan/Auditor/Bendahara).
 Materi: Akuntansi Pemerintahan (SAP PP71/2010), Laporan Keuangan Pemerintah (LRA/Neraca/LO/LAK), Keuangan Negara (UU17/2003, UU1/2004), Perpajakan (PPh21/22/23, PPN), Audit (BPK/BPKP/SPKN), APBD (Permendagri77/2020), SAI akrual. Referensi CPNS 2024-2025.
 Aturan: referensi peraturan masih berlaku, satu jawaban benar secara akuntansi/hukum, hitung ulang soal hitungan, 40% soal hitungan 60% konseptual, pengecoh meyakinkan tapi salah teknis.
 Output HANYA array JSON (tanpa markdown, tanpa komentar, tanpa teks lain):
-[{"id":1,"subtest":"SKB","subtestFull":"Seleksi Kompetensi Bidang — Akuntansi","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"C","nilai":{"benar":5,"salah":0}}]`,
+[{"id":1,"subtest":"SKB","subtestFull":"Seleksi Kompetensi Bidang — Akuntansi","tipe":"pilihan_ganda","text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},"kunciJawaban":"C","pembahasanSingkat":"Untuk soal hitungan: langkah 1... langkah 2... hasil C. Untuk konseptual: alasan C benar karena...","referensi":"UU No. X / PP No. X","nilai":{"benar":5,"salah":0}}]`,
 };
 
 const VALID = { skd:['TWK','TIU','TKP'], skb:['SKB'] };
