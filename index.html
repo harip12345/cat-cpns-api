@@ -494,7 +494,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 // =============================================================
 // KONFIGURASI
 // =============================================================
-const BASE_URL = 'https://cat-cpns-api.vercel.app/';
+const BASE_URL = 'https://cat-cpns-api.vercel.app';
 
 // Konfigurasi soal sesuai standar BKN
 // total = jumlah soal final, batch = soal per-generate
@@ -731,7 +731,20 @@ async function generateBatch(examType, subtestKey, batchIndex, count) {
   } catch (err) {
     hideLoading();
     if (btn) { btn.disabled = false; btn.classList.remove('loading'); btn.textContent = `Soal — Coba Lagi`; }
-    alert('Gagal mengambil soal: ' + err.message);
+    let errMsg = err.message;
+    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+      errMsg = 'Tidak dapat terhubung ke server API.\n\n' +
+        'Pastikan:\n' +
+        '• Anda membuka halaman dari URL Vercel (bukan file lokal)\n' +
+        '• Koneksi internet aktif\n' +
+        '• API Vercel sudah di-deploy ulang setelah perubahan terakhir\n\n' +
+        'URL API: ' + BASE_URL;
+    } else if (err.message.includes('504') || err.message.includes('timeout')) {
+      errMsg = 'Server timeout (504). AI sedang sibuk, coba lagi dalam beberapa detik.';
+    } else if (err.message.includes('429')) {
+      errMsg = 'Rate limit Groq tercapai. Tunggu beberapa menit lalu coba lagi.';
+    }
+    alert('❌ ' + errMsg);
   }
 }
 
