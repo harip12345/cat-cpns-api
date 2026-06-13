@@ -750,29 +750,55 @@ function goToStep2() {
     step2Title.textContent = 'Pilih Subtest Awal SKD';
     step2Desc.textContent  = `Halo ${nama}! Mulai dari subtest mana?`;
     btnsEl.innerHTML = `
-      <button class="exam-select-btn" onclick="startFromModal('skd','TWK')">
-        <span class="btn-icon">📝</span>
-        <div class="btn-info"><div class="btn-title">Mulai dari TWK</div>
-        <div class="btn-sub">Tes Wawasan Kebangsaan · 30 soal</div></div>
-      </button>
-      <button class="exam-select-btn" onclick="startFromModal('skd','TIU')">
-        <span class="btn-icon">🧮</span>
-        <div class="btn-info"><div class="btn-title">Mulai dari TIU</div>
-        <div class="btn-sub">Tes Intelejensi Umum · 35 soal</div></div>
-      </button>
-      <button class="exam-select-btn" onclick="startFromModal('skd','TKP')">
-        <span class="btn-icon">🤝</span>
-        <div class="btn-info"><div class="btn-title">Mulai dari TKP</div>
-        <div class="btn-sub">Tes Karakteristik Pribadi · 45 soal</div></div>
-      </button>`;
+      <div style="font-size:.75rem;font-weight:700;color:var(--textsub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Pilih Sumber Soal:</div>
+
+      <div style="background:var(--light);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:.78rem;font-weight:700;color:var(--blue);margin-bottom:8px">📦 Dari Database (Soal Tersimpan)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="exam-select-btn" style="flex:1;min-width:120px" onclick="startFromModal('skd','TWK','db')">
+            <span class="btn-icon">📝</span>
+            <div class="btn-info"><div class="btn-title">TWK</div><div class="btn-sub">dari database</div></div>
+          </button>
+          <button class="exam-select-btn" style="flex:1;min-width:120px" onclick="startFromModal('skd','TIU','db')">
+            <span class="btn-icon">🧮</span>
+            <div class="btn-info"><div class="btn-title">TIU</div><div class="btn-sub">dari database</div></div>
+          </button>
+          <button class="exam-select-btn" style="flex:1;min-width:120px" onclick="startFromModal('skd','TKP','db')">
+            <span class="btn-icon">🤝</span>
+            <div class="btn-info"><div class="btn-title">TKP</div><div class="btn-sub">dari database</div></div>
+          </button>
+        </div>
+      </div>
+
+      <div style="background:#fff8f0;border-radius:10px;padding:12px;border:1px solid #fcd9b0">
+        <div style="font-size:.78rem;font-weight:700;color:var(--red);margin-bottom:8px">🤖 Generate Soal Baru (AI)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="exam-select-btn" style="flex:1;min-width:120px;border-color:var(--red)" onclick="startFromModal('skd','TWK','generate')">
+            <span class="btn-icon">📝</span>
+            <div class="btn-info"><div class="btn-title">TWK</div><div class="btn-sub">generate baru</div></div>
+          </button>
+          <button class="exam-select-btn" style="flex:1;min-width:120px;border-color:var(--red)" onclick="startFromModal('skd','TIU','generate')">
+            <span class="btn-icon">🧮</span>
+            <div class="btn-info"><div class="btn-title">TIU</div><div class="btn-sub">generate baru</div></div>
+          </button>
+          <button class="exam-select-btn" style="flex:1;min-width:120px;border-color:var(--red)" onclick="startFromModal('skd','TKP','generate')">
+            <span class="btn-icon">🤝</span>
+            <div class="btn-info"><div class="btn-title">TKP</div><div class="btn-sub">generate baru</div></div>
+          </button>
+        </div>
+      </div>`;
   } else {
     step2Title.textContent = 'Konfirmasi SKB Akuntansi';
     step2Desc.textContent  = `Halo ${nama}! Klik mulai untuk memulai SKB Akuntansi.`;
     btnsEl.innerHTML = `
-      <button class="exam-select-btn skb" onclick="startFromModal('skb','SKB')">
-        <span class="btn-icon">📊</span>
-        <div class="btn-info"><div class="btn-title">Mulai SKB Akuntansi</div>
-        <div class="btn-sub">100 soal · Timer 90 menit</div></div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--textsub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Pilih Sumber Soal:</div>
+      <button class="exam-select-btn skb" onclick="startFromModal('skb','SKB','db')">
+        <span class="btn-icon">📦</span>
+        <div class="btn-info"><div class="btn-title">Dari Database</div><div class="btn-sub">Pakai soal yang sudah tersimpan</div></div>
+      </button>
+      <button class="exam-select-btn skb" style="border-color:var(--red)" onclick="startFromModal('skb','SKB','generate')">
+        <span class="btn-icon">🤖</span>
+        <div class="btn-info"><div class="btn-title">Generate Soal Baru</div><div class="btn-sub">Buat soal baru dari AI</div></div>
       </button>`;
   }
 
@@ -788,9 +814,9 @@ document.getElementById('input-nama').addEventListener('keydown', e => {
   if (e.key === 'Enter') goToStep2();
 });
 
-async function startFromModal(examType, startSubtest) {
+async function startFromModal(examType, startSubtest, mode = 'db') {
   closeModalNama();
-  await quickStart(examType, startSubtest);
+  await quickStart(examType, startSubtest, mode);
 }
 
 // ── Simpan hasil ke leaderboard setelah submit ───────────────
@@ -848,48 +874,55 @@ document.getElementById('modal-finish').addEventListener('click', e=>{
 // =============================================================
 // QUICK START — langsung generate batch pertama & masuk ujian
 // =============================================================
-async function quickStart(examType, startSubtest) {
-  S.examType      = examType;
-  S.questions     = [];
-  S.userAnswers   = {};
-  S.flagged       = new Set();
-  S.currentQ      = 0;
-  S.batchDone     = {};
-  S.generating    = false;
+// mode: 'db' = hanya dari database | 'generate' = generate baru batch pertama
+async function quickStart(examType, startSubtest, mode = 'db') {
+  S.examType    = examType;
+  S.questions   = [];
+  S.userAnswers = {};
+  S.flagged     = new Set();
+  S.currentQ    = 0;
+  S.batchDone   = {};
+  S.generating  = false;
   EXAM_CFG[examType].subtests.forEach(st => { S.batchDone[st.key] = 0; });
 
-  const cfg = EXAM_CFG[examType];
+  const cfg          = EXAM_CFG[examType];
   const allQuestions = [];
-  let globalId = 1;
-  let anyLoaded = false;
+  let   globalId     = 1;
 
-  // ── Coba load SEMUA batch yang sudah ada di database ──────
   showLoading('Memeriksa soal di database...');
+
+  // ── Load semua batch yang ada di DB ─────────────────────────
   for (const st of cfg.subtests) {
     const batches = Math.ceil(st.total / BATCH);
     for (let b = 0; b < batches; b++) {
       try {
-        setLoadingMsg(`Memuat ${st.key} batch ${b+1}/${batches}...`);
+        setLoadingMsg(`Memeriksa ${st.key} batch ${b+1}/${batches}...`);
         const qs = await fetchSoal(examType, st.key, BATCH, b, false);
         if (qs && qs.length) {
           qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
           allQuestions.push(...qs);
           S.batchDone[st.key] = b + 1;
-          anyLoaded = true;
         } else {
-          // Batch ini belum ada di DB — stop untuk subtest ini
-          break;
+          break; // batch ini belum ada, stop subtest ini
         }
       } catch(e) {
-        // Batch tidak ada di DB — stop untuk subtest ini
-        break;
+        break; // tidak ada di DB
       }
     }
   }
 
-  // ── Jika tidak ada sama sekali di DB, generate batch pertama ──
-  if (!anyLoaded) {
-    setLoadingMsg(`Generating soal ${startSubtest} pertama...`);
+  // ── Jika DB kosong dan mode generate → generate batch pertama ─
+  if (allQuestions.length === 0) {
+    if (mode === 'db') {
+      // Tidak ada soal di DB dan user pilih "dari database"
+      hideLoading();
+      alert(`⚠️ Belum ada soal ${examType.toUpperCase()} di database.
+
+Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
+      return;
+    }
+    // mode === 'generate'
+    setLoadingMsg(`Generating soal ${startSubtest} batch pertama...`);
     try {
       const qs = await fetchSoal(examType, startSubtest, BATCH, 0, false);
       qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
@@ -897,7 +930,7 @@ async function quickStart(examType, startSubtest) {
       S.batchDone[startSubtest] = 1;
     } catch(err) {
       hideLoading();
-      alert('❌ Gagal mengambil soal:\n' + err.message);
+      alert('❌ Gagal generate soal:\n' + err.message);
       return;
     }
   }
@@ -913,12 +946,6 @@ async function quickStart(examType, startSubtest) {
   startTimer();
   updateAddBtn();
   populateRegenSelect();
-
-  const loaded = allQuestions.length;
-  const total  = cfg.subtests.reduce((a,st) => a+st.total, 0);
-  if (loaded >= total) {
-    setTimeout(() => setLoadingMsg(''), 100);
-  }
 }
 
 function setLoadingMsg(msg) {
