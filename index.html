@@ -198,6 +198,14 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .review-body.open{display:block}
 .review-item{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:.83rem}
 .review-item:last-child{border-bottom:none}
+.review-item-wrap{border-bottom:1px solid var(--border)}
+.review-item-wrap:last-child{border-bottom:none}
+.review-item-wrap .review-item{border-bottom:none}
+.review-detail{padding:8px 14px 12px 36px;font-size:.8rem;line-height:1.6}
+.review-correct-ans{color:var(--green);font-weight:600;margin-bottom:4px}
+.review-best{color:var(--blue2);font-weight:600;display:block;margin-bottom:3px}
+.review-opt-row{color:var(--textsub);margin-bottom:3px}
+.review-reason{background:#f0f7ff;border-left:3px solid var(--blue2);padding:6px 10px;border-radius:4px;color:var(--text);margin-top:5px}
 .review-no{font-weight:700;color:var(--blue);min-width:26px}
 .review-q{flex:1;color:var(--textsub);line-height:1.5}
 .review-ans{font-weight:700}
@@ -207,6 +215,8 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .btn-back-menu{display:block;width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;margin-bottom:28px}
 .btn-back-menu:hover{opacity:.88}
 
+.btn-selesai-final{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:.84rem;font-weight:700;cursor:pointer;margin-left:auto;animation:pulse-red 1.5s infinite}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}70%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
 @media(max-width:768px){
   .exam-layout{grid-template-columns:1fr}
   .nav-panel{border-left:none;border-top:2px solid var(--border);height:auto;position:static;order:-1}
@@ -230,6 +240,21 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   <div class="loader-msg" id="loader-msg">Memuat soal...</div>
 </div>
 
+<!-- MODAL KONFIRMASI KEMBALI HOME -->
+<div class="modal-overlay" id="modal-home">
+  <div class="modal-box">
+    <div class="modal-header">🏠 Kembali ke Menu Utama?</div>
+    <div class="modal-body">
+      Progres ujian Anda akan hilang dan timer akan berhenti.<br/>
+      <strong>Apakah Anda yakin ingin kembali ke menu utama?</strong>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModalHome()">Lanjut Ujian</button>
+      <button class="btn-modal-confirm" onclick="goToMenu()">Ya, Kembali</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL SELESAI -->
 <div class="modal-overlay" id="modal-finish">
   <div class="modal-box">
@@ -249,7 +274,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 
 <!-- NAVBAR -->
 <nav class="top-navbar">
-  <div class="navbar-brand">
+  <div class="navbar-brand" id="navbar-brand" onclick="handleNavbarClick()" style="cursor:pointer;user-select:none">
     <div class="navbar-logo">BKN</div>
     <div>
       <div class="navbar-title">CAT BKN</div>
@@ -533,9 +558,10 @@ async function quickStart(examType, startSubtest) {
   // Init batchDone semua subtest ke 0
   EXAM_CFG[examType].subtests.forEach(st => { S.batchDone[st.key] = 0; });
 
-  showLoading(`Mengambil 10 soal ${startSubtest} pertama...`);
+  showLoading(`Memeriksa cache soal ${startSubtest}...`);
 
   try {
+    // forceNew=false → API akan cek Firebase cache dulu sebelum generate
     const questions = await fetchSoal(examType, startSubtest, BATCH, 0, false);
     questions.forEach((q,i) => { q.id=i+1; q.nilai=q.nilai||{benar:5,salah:0}; });
     S.questions  = questions;
@@ -774,8 +800,32 @@ function renderQuestion(idx) {
     optEl.appendChild(item);
   });
 
-  document.getElementById('btn-prev').disabled=idx===0;
-  document.getElementById('btn-next').disabled=idx===S.questions.length-1;
+  document.getElementById('btn-prev').disabled = idx === 0;
+
+  // Tombol Next: jika soal terakhir yang sudah ada → tampilkan "Selesai Ujian"
+  const nextBtn = document.getElementById('btn-next');
+  const isLastQ = idx === S.questions.length - 1;
+  const noMoreQ = !EXAM_CFG[S.examType]?.subtests.find(st =>
+    (S.questions.filter(q => q.subtest === st.key).length) < st.total
+  );
+  if (isLastQ && noMoreQ) {
+    // Semua soal sudah di-generate dan ini soal terakhir
+    nextBtn.textContent = '⏹ Selesai Ujian';
+    nextBtn.className   = 'btn-selesai-final';
+    nextBtn.onclick     = openModal;
+    nextBtn.disabled    = false;
+  } else if (isLastQ) {
+    // Masih ada soal yang bisa di-generate
+    nextBtn.textContent = 'Next ▶';
+    nextBtn.className   = 'btn-nav btn-next';
+    nextBtn.onclick     = () => navigate(1);
+    nextBtn.disabled    = true;
+  } else {
+    nextBtn.textContent = 'Next ▶';
+    nextBtn.className   = 'btn-nav btn-next';
+    nextBtn.onclick     = () => navigate(1);
+    nextBtn.disabled    = false;
+  }
 
   if (S.examType==='skd') {
     document.querySelectorAll('.section-tab').forEach(t=>t.classList.toggle('active',t.textContent===q.subtest));
@@ -855,18 +905,50 @@ function submitExam() {
       `Skor SKB Akuntansi: ${total} dari ${qs.length*5} poin. Akan diakumulasi dengan SKD untuk penetapan peringkat akhir.`;
   }
 
-  document.getElementById('review-body').innerHTML=qs.map((q,i)=>{
-    const jaw=ua[i];
-    let cls='skip',txt='Tidak dijawab';
-    if(jaw){
-      if(q.tipe==='tkp'){cls='correct';txt=`${jaw} (Skor: ${q.nilaiOpsi?.[jaw]||0})`;}
-      else if(jaw===q.kunciJawaban){cls='correct';txt=`${jaw} ✓ Benar`;}
-      else{cls='wrong';txt=`${jaw} ✗ (Kunci: ${q.kunciJawaban})`;}
+  document.getElementById('review-body').innerHTML = qs.map((q, i) => {
+    const jaw = ua[i];
+    let statusCls = 'skip', statusTxt = 'Tidak dijawab';
+    let detailHTML = '';
+
+    if (q.tipe === 'tkp') {
+      // TKP — tampilkan skor opsi dan alasan
+      const skorUser = jaw ? (q.nilaiOpsi?.[jaw] || 0) : 0;
+      const bestOpt  = jaw ? Object.entries(q.nilaiOpsi||{}).sort((a,b)=>b[1]-a[1])[0] : null;
+      statusCls = jaw ? 'correct' : 'skip';
+      statusTxt = jaw ? `${jaw} (Skor: ${skorUser}/5)` : 'Tidak dijawab';
+      if (bestOpt && jaw !== bestOpt[0]) {
+        detailHTML = `<div class="review-detail">
+          <span class="review-best">Jawaban terbaik: <strong>${bestOpt[0]}</strong> (Skor ${bestOpt[1]})</span>
+          <div class="review-opt-row">Opsi ${bestOpt[0]}: ${q.options[bestOpt[0]]}</div>
+          ${q.alasanSkor?.[bestOpt[0]] ? `<div class="review-reason">💡 ${q.alasanSkor[bestOpt[0]]}</div>` : ''}
+        </div>`;
+      }
+    } else {
+      const benar = q.kunciJawaban;
+      if (!jaw) {
+        statusCls = 'skip'; statusTxt = `Tidak dijawab (Kunci: ${benar})`;
+      } else if (jaw === benar) {
+        statusCls = 'correct'; statusTxt = `${jaw} ✓ Benar`;
+      } else {
+        statusCls = 'wrong'; statusTxt = `${jaw} ✗  (Kunci: ${benar})`;
+      }
+      // Tampilkan teks jawaban benar
+      const benarTeks = q.options?.[benar] || '';
+      // Pembahasan jika ada
+      const pembahasan = q.pembahasanSingkat || q.pembahasan || '';
+      detailHTML = `<div class="review-detail">
+        <div class="review-correct-ans">✅ Jawaban benar: <strong>${benar}</strong> — ${benarTeks}</div>
+        ${pembahasan ? `<div class="review-reason">💡 ${pembahasan}</div>` : ''}
+      </div>`;
     }
-    return `<div class="review-item">
-      <div class="review-no">${i+1}.</div>
-      <div class="review-q">[${q.subtest}] ${q.text.substring(0,85)}${q.text.length>85?'...':''}</div>
-      <div class="review-ans ${cls}">${txt}</div>
+
+    return `<div class="review-item-wrap">
+      <div class="review-item">
+        <div class="review-no">${i+1}.</div>
+        <div class="review-q">[${q.subtest}] ${q.text.substring(0,100)}${q.text.length>100?'...':''}</div>
+        <div class="review-ans ${statusCls}">${statusTxt}</div>
+      </div>
+      ${detailHTML}
     </div>`;
   }).join('');
 
@@ -877,8 +959,26 @@ function toggleReview(){
   const body=document.getElementById('review-body');
   document.getElementById('review-toggle-icon').textContent=body.classList.toggle('open')?'▲':'▼';
 }
+function handleNavbarClick() {
+  const view = document.querySelector('.view.active')?.id;
+  if (view === 'view-ujian') {
+    // Sedang ujian — minta konfirmasi
+    document.getElementById('modal-home').classList.add('show');
+  } else if (view === 'view-hasil') {
+    goToMenu();
+  }
+  // Di menu — tidak perlu action
+}
+function closeModalHome() {
+  document.getElementById('modal-home').classList.remove('show');
+}
+document.getElementById('modal-home').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-home')) closeModalHome();
+});
+
 function goToMenu(){
   clearInterval(S.timerInterval);
+  document.getElementById('modal-home').classList.remove('show');
   S={examType:null,questions:[],userAnswers:{},flagged:new Set(),currentQ:0,timeLeft:0,timerInterval:null,batchDone:{},currentSubtest:null,generating:false};
   showView('menu');
 }
