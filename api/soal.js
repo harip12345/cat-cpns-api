@@ -12,11 +12,14 @@ function cors(res) {
 }
 
 // ─── Model fallback chain ──────────────────────────────────────
+// Menggunakan model-model terbaru yang didukung oleh Groq saat ini
 const MODELS = [
+  'openai/gpt-oss-20b',
+  'qwen/qwen3-32b',
+  'moonshotai/kimi-k2-instruct',
+  'meta-llama/llama-4-scout-17b-16e-instruct',
   'llama-3.3-70b-versatile',
-  'llama-3.1-8b-instant',
-  'mixtral-8x7b-32768',
-  'gemma2-9b-it',
+  'llama-3.1-8b-instant'
 ];
 
 // ─── System Prompts ────────────────────────────────────────────
@@ -113,7 +116,6 @@ async function fsSet(col, doc, data, extraFields = {}) {
     Object.entries(extraFields).forEach(([k,v]) => {
       fields[k] = typeof v === 'number' ? { integerValue: v } : { stringValue: String(v) };
     });
-    // Build updateMask
     const mask = Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');
     const r = await fetch(`${fsUrl(pid, col, doc)}?${mask}`, {
       method:'PATCH',
@@ -142,7 +144,7 @@ async function generate(groq, subtest, count) {
     ? [process.env.GROQ_MODEL, ...MODELS.filter(m => m !== process.env.GROQ_MODEL)]
     : MODELS;
   
-  let lastErr = null;
+  let errorLogs = [];
   
   for (const model of models) {
     try {
@@ -170,20 +172,20 @@ async function generate(groq, subtest, count) {
     } catch(err) {
       console.warn(`Gagal menggunakan ${model}: ${err.message}`);
       
-      // Jika error adalah unauthorized/API Key salah, langsung hentikan
+      // Jika error API Key salah, langsung hentikan
       if (err.status === 401) {
-        throw err;
+        throw new Error('GROQ_API_KEY tidak valid / Unauthorized.');
       }
       
-      // Simpan error terakhir dan lanjutkan ke model berikutnya di array
-      // Mencakup error 400 (model decommissioned), 429 (rate limit), 5xx (server error)
-      lastErr = err; 
+      // Kumpulkan riwayat eror per model untuk ditampilkan jika semua gagal
+      const errorDetail = err.message || 'Unknown error';
+      errorLogs.push(`[${model}: ${errorDetail}]`);
       continue;
     }
   }
   
-  // Jika loop selesai tapi tidak ada yang berhasil, lempar error terakhir
-  throw new Error('Semua model gagal memproses permintaan: ' + (lastErr?.message || 'Unknown error'));
+  // Menampilkan seluruh histori error agar tahu penyebab aslinya
+  throw new Error('Semua model Groq gagal dicoba. Detail: ' + errorLogs.join(' | '));
 }
 
 // ─── Main Handler ──────────────────────────────────────────────
@@ -203,10 +205,8 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ success:false, error:'GROQ_API_KEY belum diset.' });
 
-  // Dokumen Firestore: soal_bank/skd_TWK_b0, skd_TWK_b1, dst.
   const docId = `${type}_${sub}_b${batchIndex}`;
 
-  // ── Cek database dulu (kecuali forceNew) ──────────────────
   if (!forceNew) {
     try {
       const stored = await fsGet('soal_bank', docId);
@@ -220,7 +220,6 @@ module.exports = async function handler(req, res) {
     } catch(e) { console.warn('DB read error:', e.message); }
   }
 
-  // ── Generate dari Groq ─────────────────────────────────────
   try {
     const groq = new Groq({ apiKey });
     const { questions, model } = await generate(groq, sub, count);
@@ -230,7 +229,6 @@ module.exports = async function handler(req, res) {
       q.nilai = q.nilai || { benar:5, salah:0 };
     });
 
-    // Simpan permanen ke Firestore
     fsSet('soal_bank', docId, questions, {
       examType: type, subtest: sub, batchIndex, count: questions.length,
     }).then(ok => console.log(`DB save ${ok?'OK':'FAIL'}: ${docId}`))
@@ -243,7 +241,6 @@ module.exports = async function handler(req, res) {
     });
   } catch(err) {
     console.error('Generate error:', err.message);
-    if (err.status === 401) return res.status(401).json({ success:false, error:'GROQ_API_KEY tidak valid.' });
     return res.status(500).json({ success:false, error: err.message });
   }
 };
