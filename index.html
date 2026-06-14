@@ -122,7 +122,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .kunci-ref{font-size:.72rem;color:var(--blue2);margin-top:4px;font-style:italic}
 .question-card{background:#fff;border-radius:12px;padding:22px 24px;box-shadow:var(--shadow);margin-bottom:16px;border:1px solid var(--border)}
 .question-text{font-size:.94rem;line-height:1.9;font-weight:500;color:var(--text)}
-.options-list{display:flex;flex-direction:column;gap:9px}
+.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .option-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:2px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;user-select:none}
 .option-item:hover{border-color:var(--blue2);background:#f0f4ff;box-shadow:0 2px 8px rgba(0,81,200,.1)}
 .option-item.selected{border-color:var(--green);background:#edfaf3;box-shadow:0 2px 8px rgba(26,158,78,.12)}
@@ -282,28 +282,84 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
 @media(max-width:768px){
-  .exam-layout{grid-template-columns:1fr;display:flex;flex-direction:column}
-  /* Soal di atas, nav panel di bawah */
-  .question-panel{order:1;padding:14px 13px 130px}
-  .nav-panel{order:2;border-left:none;border-top:2px solid var(--border);height:auto;position:static;max-height:240px;overflow-y:auto}
-  .nav-bottom{width:100%;padding:8px 10px;gap:6px}
-  .exam-topbar{position:static}
-  .soal-grid{grid-template-columns:repeat(7,1fr);overflow-x:auto}
-  /* Nav bottom mobile — semua tombol muat 1 baris */
-  .btn-nav{padding:7px 9px;font-size:.75rem;min-width:0}
-  .btn-add-soal{padding:7px 9px;font-size:.72rem;min-width:0}
-  .btn-finish{padding:6px 10px;font-size:.75rem}
-  .btn-selesai-final{padding:7px 9px;font-size:.75rem}
-  /* Timer lebih kecil di mobile */
-  .timer-value{font-size:1.1rem}
-  .exam-topbar{flex-wrap:wrap;gap:8px;padding:8px 14px}
+  /* ── KUNCI: exam page = 1 scroll, posisi fixed ── */
+
+  /* Topbar tetap terlihat, tidak ikut scroll */
+  .exam-topbar{
+    position:fixed;top:58px;left:0;right:0;z-index:90;
+    flex-wrap:nowrap;gap:6px;padding:7px 12px;
+  }
+  /* Navbar juga fixed */
+  .top-navbar{position:fixed;top:0;left:0;right:0;z-index:100}
+
+  /* Body saat ujian butuh offset agar konten tidak tertutup */
+  body.exam-mode{padding-top:calc(58px + 52px)} /* navbar + topbar */
+
+  /* Layout: flex column, isi sisa tinggi layar setelah topbar+navbottom */
+  .exam-layout{
+    grid-template-columns:1fr;
+    display:flex;
+    flex-direction:column;
+    height:calc(100dvh - 58px - 52px - 54px);
+    /* 58px navbar + 52px topbar + 54px nav-bottom */
+    overflow:hidden; /* TIDAK ada scroll di level ini */
+    margin-top:calc(58px + 52px); /* offset fixed headers */
+  }
+
+  /* Soal: flex grow, HANYA area ini yang scroll */
+  .question-panel{
+    order:1;
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:12px 13px 10px; /* hapus padding bawah besar */
+    min-height:0;
+  }
+
+  /* Nav panel: tinggi tetap, scroll sendiri di dalam */
+  .nav-panel{
+    order:2;
+    flex-shrink:0;
+    border-left:none;
+    border-top:1.5px solid var(--border);
+    height:200px; /* tinggi tetap, tidak melar */
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:static;
+    padding:10px 12px;
+  }
+
+  /* Nav bottom: fixed di paling bawah */
+  .nav-bottom{
+    position:fixed;bottom:0;left:0;right:0;
+    width:100%;padding:7px 10px;gap:5px;
+    z-index:80;
+    background:#fff;
+    border-top:1.5px solid var(--border);
+  }
+
+  /* Grid soal — wrap rapi */
+  .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
+
+  /* Tombol nav lebih kecil */
+  .btn-nav{padding:7px 8px;font-size:.74rem;min-width:0}
+  .btn-add-soal{padding:7px 8px;font-size:.71rem;min-width:0}
+  .btn-finish{padding:6px 9px;font-size:.74rem}
+  .btn-selesai-final{padding:7px 8px;font-size:.74rem}
+
+  /* Timer compact */
+  .timer-value{font-size:1rem}
+  .timer-box{padding:5px 10px}
+  .exam-info-section{font-size:.85rem}
+  .exam-info-type{font-size:.65rem}
 }
 @media(max-width:480px){
   .soal-grid{grid-template-columns:repeat(6,1fr)}
-  .question-panel{padding:14px 12px 130px}
-  .nav-bottom{padding:6px 8px;gap:4px}
-  .btn-nav{padding:7px 8px;font-size:.74rem}
-  .btn-add-soal{font-size:.72rem;padding:7px 8px}
+  .nav-panel{height:180px}
+  .exam-layout{height:calc(100dvh - 58px - 48px - 50px)}
+  .exam-layout{margin-top:calc(58px + 48px)}
+  .btn-nav{padding:6px 7px;font-size:.72rem}
+  .btn-add-soal{font-size:.7rem;padding:6px 7px}
 }
 </style>
 </head>
@@ -997,6 +1053,8 @@ Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
   // Tampilkan nama peserta di navbar
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
+  // Tambah class exam-mode ke body untuk offset fixed headers di mobile
+  document.body.classList.add('exam-mode');
   renderNavGrid();
   renderQuestion(0);
   startTimer();
@@ -1349,8 +1407,9 @@ function renderQuestion(idx) {
   // Scroll ke atas di mobile — tampilkan soal, bukan kotak grid
   const isMobile = window.innerWidth <= 768;
   if (isMobile) {
-    // Scroll halaman ke paling atas agar soal langsung terlihat
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll question-panel ke atas (bukan window, karena layout fixed)
+    const qPanel = document.querySelector('.question-panel');
+    if (qPanel) qPanel.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Scroll kotak aktif di nav grid ke posisi terlihat (tanpa scroll halaman)
@@ -1565,6 +1624,7 @@ function submitExam() {
   lbBtn.onclick = () => { lbCurrentTab = S.examType; showView('leaderboard'); };
   reviewSec.parentNode.insertBefore(lbBtn, reviewSec);
 
+  document.body.classList.remove('exam-mode');
   showView('hasil');
 }
 
@@ -1680,6 +1740,7 @@ Soal lama di database akan ditimpa.`)) return;
 function goToMenu(){
   clearInterval(S.timerInterval);
   document.getElementById('modal-home').classList.remove('show');
+  document.body.classList.remove('exam-mode');
   const prevNama = S.namaPeserta;
   S={examType:null,namaPeserta:prevNama,questions:[],userAnswers:{},flagged:new Set(),currentQ:0,timeLeft:0,timerInterval:null,batchDone:{},generating:false};
   showView('menu');
