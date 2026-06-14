@@ -143,13 +143,6 @@ KISI-KISI RESMI TIU CPNS 2024-2025 — TIGA KEMAMPUAN UTAMA:
   - Contoh pola soal: "Semua dokter adalah sarjana. Sebagian sarjana adalah pengusaha. Kesimpulan yang PASTI benar adalah..."
   - WAJIB: Tuliskan struktur premis secara formal di pembahasanSingkat
 
-━━━ 3. KEMAMPUAN FIGURAL ━━━
-(Dideskripsikan dalam teks karena format JSON — gambarkan pola secara verbal)
-  - Pattern completion: deskripsi pola bentuk geometri yang berputar, dicerminkan, atau berubah ukuran
-  - Odd one out: identifikasi gambar yang tidak sesuai pola
-  - Matrix pattern: pola dalam grid 3×3
-  - Contoh soal figural berbasis teks: "Dalam barisan gambar: lingkaran besar → lingkaran sedang → lingkaran kecil → kotak besar → kotak sedang → ... Gambar selanjutnya adalah ..."
-
 ATURAN KETAT PEMBUATAN SOAL:
 1. HITUNG ULANG setiap jawaban numerik dari nol — cantumkan langkah di pembahasanSingkat
 2. Pengecoh numerik WAJIB berupa hasil kesalahan umum (misal: lupa balik nilai, salah operasi urutan)
