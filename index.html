@@ -282,84 +282,86 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
 @media(max-width:768px){
-  /* ── KUNCI: exam page = 1 scroll, posisi fixed ── */
+  /* ══ MOBILE EXAM: 1 scroll, topbar selalu terlihat ══ */
 
-  /* Topbar tetap terlihat, tidak ikut scroll */
+  /* Navbar & topbar: sticky di atas, tidak hilang saat scroll */
+  .top-navbar{position:sticky;top:0;z-index:100}
   .exam-topbar{
-    position:fixed;top:58px;left:0;right:0;z-index:90;
+    position:sticky;top:58px;z-index:90;
     flex-wrap:nowrap;gap:6px;padding:7px 12px;
+    background:#fff;
   }
-  /* Navbar juga fixed */
-  .top-navbar{position:fixed;top:0;left:0;right:0;z-index:100}
 
-  /* Body saat ujian butuh offset agar konten tidak tertutup */
-  body.exam-mode{padding-top:calc(58px + 52px)} /* navbar + topbar */
-
-  /* Layout: flex column, isi sisa tinggi layar setelah topbar+navbottom */
+  /* Exam layout: flex column, full viewport, 1 scroll total */
   .exam-layout{
-    grid-template-columns:1fr;
     display:flex;
     flex-direction:column;
+    grid-template-columns:unset;
+    min-height:unset;
+    /* Tinggi = viewport - navbar - topbar - navbottom */
     height:calc(100dvh - 58px - 52px - 54px);
-    /* 58px navbar + 52px topbar + 54px nav-bottom */
-    overflow:hidden; /* TIDAK ada scroll di level ini */
-    margin-top:calc(58px + 52px); /* offset fixed headers */
+    overflow:hidden;
   }
 
-  /* Soal: flex grow, HANYA area ini yang scroll */
+  /* Question panel: scroll DI DALAM panel ini saja */
   .question-panel{
     order:1;
-    flex:1;
+    flex:1 1 0;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    padding:12px 13px 10px; /* hapus padding bawah besar */
+    padding:12px 13px 8px;
     min-height:0;
+    background:var(--light);
   }
 
   /* Nav panel: tinggi tetap, scroll sendiri di dalam */
   .nav-panel{
     order:2;
-    flex-shrink:0;
-    border-left:none;
-    border-top:1.5px solid var(--border);
-    height:200px; /* tinggi tetap, tidak melar */
+    flex:0 0 200px;
+    height:200px;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     position:static;
-    padding:10px 12px;
+    border-left:none;
+    border-top:1.5px solid var(--border);
+    padding:10px 12px 6px;
   }
 
-  /* Nav bottom: fixed di paling bawah */
+  /* Nav bottom: sticky ke bawah */
   .nav-bottom{
     position:fixed;bottom:0;left:0;right:0;
     width:100%;padding:7px 10px;gap:5px;
-    z-index:80;
-    background:#fff;
-    border-top:1.5px solid var(--border);
+    z-index:80;border-top:1.5px solid var(--border);
   }
 
-  /* Grid soal — wrap rapi */
+  /* Soal grid */
   .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
 
-  /* Tombol nav lebih kecil */
+  /* Buttons */
   .btn-nav{padding:7px 8px;font-size:.74rem;min-width:0}
   .btn-add-soal{padding:7px 8px;font-size:.71rem;min-width:0}
   .btn-finish{padding:6px 9px;font-size:.74rem}
   .btn-selesai-final{padding:7px 8px;font-size:.74rem}
 
-  /* Timer compact */
+  /* Timer & topbar lebih compact */
   .timer-value{font-size:1rem}
-  .timer-box{padding:5px 10px}
+  .timer-box{padding:5px 10px;gap:6px}
   .exam-info-section{font-size:.85rem}
   .exam-info-type{font-size:.65rem}
+  .btn-finish{font-size:.72rem;padding:6px 8px}
+
+  /* Hapus margin-top exam-layout (tidak perlu karena sticky) */
+  #view-ujian .exam-layout{margin-top:0}
 }
+
 @media(max-width:480px){
   .soal-grid{grid-template-columns:repeat(6,1fr)}
-  .nav-panel{height:180px}
+  .nav-panel{flex:0 0 170px;height:170px}
   .exam-layout{height:calc(100dvh - 58px - 48px - 50px)}
-  .exam-layout{margin-top:calc(58px + 48px)}
+  .question-panel{padding:10px 11px 6px}
   .btn-nav{padding:6px 7px;font-size:.72rem}
   .btn-add-soal{font-size:.7rem;padding:6px 7px}
+  .nav-bottom{padding:6px 8px;gap:4px}
 }
 </style>
 </head>
@@ -1054,7 +1056,7 @@ Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
   // Tambah class exam-mode ke body untuk offset fixed headers di mobile
-  document.body.classList.add('exam-mode');
+
   renderNavGrid();
   renderQuestion(0);
   startTimer();
@@ -1624,7 +1626,7 @@ function submitExam() {
   lbBtn.onclick = () => { lbCurrentTab = S.examType; showView('leaderboard'); };
   reviewSec.parentNode.insertBefore(lbBtn, reviewSec);
 
-  document.body.classList.remove('exam-mode');
+
   showView('hasil');
 }
 
@@ -1740,7 +1742,7 @@ Soal lama di database akan ditimpa.`)) return;
 function goToMenu(){
   clearInterval(S.timerInterval);
   document.getElementById('modal-home').classList.remove('show');
-  document.body.classList.remove('exam-mode');
+
   const prevNama = S.namaPeserta;
   S={examType:null,namaPeserta:prevNama,questions:[],userAnswers:{},flagged:new Set(),currentQ:0,timeLeft:0,timerInterval:null,batchDone:{},generating:false};
   showView('menu');
