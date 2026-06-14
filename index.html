@@ -285,10 +285,10 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   .exam-layout{grid-template-columns:1fr;display:flex;flex-direction:column}
   /* Soal di atas, nav panel di bawah */
   .question-panel{order:1;padding:14px 13px 130px}
-  .nav-panel{order:2;border-left:none;border-top:2px solid var(--border);height:auto;position:static}
+  .nav-panel{order:2;border-left:none;border-top:2px solid var(--border);height:auto;position:static;max-height:240px;overflow-y:auto}
   .nav-bottom{width:100%;padding:8px 10px;gap:6px}
   .exam-topbar{position:static}
-  .soal-grid{grid-template-columns:repeat(7,1fr)}
+  .soal-grid{grid-template-columns:repeat(7,1fr);overflow-x:auto}
   /* Nav bottom mobile — semua tombol muat 1 baris */
   .btn-nav{padding:7px 9px;font-size:.75rem;min-width:0}
   .btn-add-soal{padding:7px 9px;font-size:.72rem;min-width:0}
@@ -1346,11 +1346,17 @@ function renderQuestion(idx) {
     document.querySelectorAll('.section-tab').forEach(t=>t.classList.toggle('active',t.textContent===q.subtest));
   }
   updateNavGrid();
-  // Cari slot button untuk soal ini
+  // Scroll ke atas di mobile — tampilkan soal, bukan kotak grid
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    // Scroll halaman ke paling atas agar soal langsung terlihat
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Scroll kotak aktif di nav grid ke posisi terlihat (tanpa scroll halaman)
   const cfg2 = EXAM_CFG[S.examType];
   if (cfg2) {
-    let gSlot2 = 0;
-    let foundSlot = -1;
+    let gSlot2 = 0, foundSlot = -1;
     cfg2.subtests.forEach(st => {
       const stQ2 = S.questions.filter(q => q.subtest === st.key);
       for (let i = 0; i < st.total; i++) {
@@ -1360,7 +1366,15 @@ function renderQuestion(idx) {
     });
     if (foundSlot >= 0) {
       const ab = document.getElementById('soal-slot-' + foundSlot);
-      if (ab) ab.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if (ab) {
+        if (isMobile) {
+          // Di mobile: scroll hanya di dalam container nav-panel, bukan seluruh halaman
+          const navPanel = document.getElementById('soal-grid');
+          if (navPanel) ab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          ab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
     }
   }
 }
