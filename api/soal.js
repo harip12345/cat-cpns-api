@@ -11,13 +11,15 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
+// Model Groq per Juni 2026 — urutan: terbaik kualitas → paling available
+// Referensi limit: console.groq.com/settings/limits
 const MODELS = [
-  'openai/gpt-oss-20b',
-  'qwen/qwen3-32b',
-  'moonshotai/kimi-k2-instruct',
-  'meta-llama/llama-4-scout-17b-16e-instruct',
-  'llama-3.3-70b-versatile',
-  'llama-3.1-8b-instant',
+  'meta-llama/llama-4-scout-17b-16e-instruct', // Llama 4 Scout — terbaru, limit besar
+  'llama-3.3-70b-versatile',                   // 70B — kualitas terbaik, 6000 RPD
+  'qwen-qwq-32b',                              // QwQ 32B — reasoning kuat
+  'llama3-groq-70b-8192-tool-use-preview',     // 70B tool-use — alternatif
+  'gemma2-9b-it',                              // Google Gemma 9B — 14400 RPD
+  'llama-3.1-8b-instant',                      // 8B — paling cepat, 14400 RPD
 ];
 
 // ─── SYSTEM PROMPTS — Expert Level, Anti-Repetisi ─────────────
