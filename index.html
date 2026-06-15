@@ -287,43 +287,49 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   .subtest-selector{padding-top:12px}
   .hasil-container{padding-top:12px}
 
-  /* ── HALAMAN UJIAN: gunakan class .ujian-active yang ditambah JS ── */
-  /* Layout ujian: flex column, mengisi viewport */
+  /* ── HALAMAN UJIAN: 1 scroll, topbar sticky ── */
   .view-ujian-active{
     display:flex !important;
     flex-direction:column;
     height:100dvh;
     overflow:hidden;
-    /* TIDAK pakai position:fixed — cukup height+overflow */
   }
+  /* Topbar sticky di atas, selalu terlihat */
   .view-ujian-active .exam-topbar{
     flex-shrink:0;
     flex-wrap:nowrap;gap:6px;padding:7px 12px;
     position:sticky;top:0;z-index:90;
   }
+  /* exam-layout: satu kolom */
   .view-ujian-active .exam-layout{
-    display:flex;flex-direction:column;
+    display:block;
     grid-template-columns:unset;min-height:unset;
-    flex:1;overflow:hidden;
+    flex:1;
+    overflow-y:auto;           /* SATU scroll di sini */
+    -webkit-overflow-scrolling:touch;
   }
+  /* Question panel: tidak ada scroll sendiri, ikut parent */
   .view-ujian-active .question-panel{
-    order:1;flex:1 1 0;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:12px 13px 8px;min-height:0;
+    overflow:visible;
+    padding:12px 13px 0;
+    min-height:unset;
     background:var(--light);
   }
+  /* Nav panel: tidak ada scroll sendiri, tidak ada border pemisah */
   .view-ujian-active .nav-panel{
-    order:2;flex:0 0 195px;height:195px;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    overflow:visible;
+    height:auto;
     position:static;border-left:none;
-    border-top:1.5px solid var(--border);
-    padding:10px 12px 6px;
+    border-top:none;           /* hapus garis pemisah */
+    padding:8px 13px 80px;    /* padding bawah untuk nav-bottom */
+    background:var(--light);
   }
+  /* Nav bottom: fixed di bawah */
   .view-ujian-active .nav-bottom{
-    position:relative;flex-shrink:0;
-    width:100%;padding:7px 10px;gap:5px;
+    position:fixed;bottom:0;left:0;right:0;
+    width:100%;padding:8px 10px;gap:5px;
     border-top:1.5px solid var(--border);
-    box-shadow:none;
+    background:#fff;z-index:80;
   }
   /* Soal grid */
   .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
@@ -342,12 +348,12 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 
 @media(max-width:480px){
   .soal-grid{grid-template-columns:repeat(6,1fr)}
-  .view-ujian-active .nav-panel{flex:0 0 170px;height:170px}
-  .view-ujian-active .question-panel{padding:10px 11px 6px}
-  .btn-nav{padding:10px 11px;font-size:.78rem;min-width:40px}
-  .btn-flag{padding:10px 10px;font-size:.78rem}
-  .btn-add-soal{font-size:.74rem;padding:10px 10px}
-  .nav-bottom{padding:6px 8px;gap:4px}
+  .view-ujian-active .question-panel{padding:10px 11px 0}
+  .view-ujian-active .nav-panel{padding:8px 11px 80px}
+  .btn-nav{padding:10px 10px;font-size:.78rem;min-width:40px}
+  .btn-flag{padding:10px 9px;font-size:.78rem}
+  .btn-add-soal{font-size:.74rem;padding:10px 9px}
+  .nav-bottom{padding:7px 8px;gap:4px}
 }
 </style>
 </head>
@@ -988,17 +994,9 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   });
 
   // ── Jika DB kosong dan mode generate → generate batch pertama ─
-  if (allQuestions.length === 0) {
-    if (mode === 'db') {
-      // Tidak ada soal di DB dan user pilih "dari database"
-      hideLoading();
-      alert(`⚠️ Belum ada soal ${examType.toUpperCase()} di database.
-
-Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
-      return;
-    }
-    // mode === 'generate'
-    setLoadingMsg(`Generating soal ${startSubtest} batch pertama...`);
+    if (allQuestions.length === 0) {
+    // DB kosong → otomatis generate AI tanpa konfirmasi
+    setLoadingMsg(`Database kosong, generating soal ${startSubtest} dari AI...`);
     try {
       const qs = await fetchSoal(examType, startSubtest, BATCH, 0, false);
       qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
@@ -1006,7 +1004,7 @@ Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
       S.batchDone[startSubtest] = 1;
     } catch(err) {
       hideLoading();
-      alert('❌ Gagal generate soal:\n' + err.message);
+      alert('❌ Gagal mengambil soal:\n' + err.message);
       return;
     }
   }
@@ -1376,9 +1374,9 @@ function renderQuestion(idx) {
   // Scroll ke atas di mobile — tampilkan soal, bukan kotak grid
   const isMobile = window.innerWidth <= 768;
   if (isMobile) {
-    // Scroll question-panel ke atas (bukan window, karena layout fixed)
-    const qPanel = document.querySelector('.question-panel');
-    if (qPanel) qPanel.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll container utama (.exam-layout) ke atas — soal selalu muncul di atas
+    const examLayout = document.querySelector('.exam-layout');
+    if (examLayout) examLayout.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   // Scroll kotak aktif di nav grid ke posisi terlihat (tanpa scroll halaman)
