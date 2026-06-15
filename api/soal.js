@@ -143,6 +143,13 @@ KISI-KISI RESMI TIU CPNS 2024-2025 — TIGA KEMAMPUAN UTAMA:
   - Contoh pola soal: "Semua dokter adalah sarjana. Sebagian sarjana adalah pengusaha. Kesimpulan yang PASTI benar adalah..."
   - WAJIB: Tuliskan struktur premis secara formal di pembahasanSingkat
 
+━━━ 3. KEMAMPUAN FIGURAL ━━━
+(Dideskripsikan dalam teks karena format JSON — gambarkan pola secara verbal)
+  - Pattern completion: deskripsi pola bentuk geometri yang berputar, dicerminkan, atau berubah ukuran
+  - Odd one out: identifikasi gambar yang tidak sesuai pola
+  - Matrix pattern: pola dalam grid 3×3
+  - Contoh soal figural berbasis teks: "Dalam barisan gambar: lingkaran besar → lingkaran sedang → lingkaran kecil → kotak besar → kotak sedang → ... Gambar selanjutnya adalah ..."
+
 ATURAN KETAT PEMBUATAN SOAL:
 1. HITUNG ULANG setiap jawaban numerik dari nol — cantumkan langkah di pembahasanSingkat
 2. Pengecoh numerik WAJIB berupa hasil kesalahan umum (misal: lupa balik nilai, salah operasi urutan)
@@ -397,16 +404,17 @@ module.exports = async function handler(req, res) {
       q.nilai = q.nilai || {benar:5,salah:0};
     });
 
-    // Simpan PERMANEN ke Firestore (async, tidak blokir response)
-    fsSet('soal_bank', docId, questions, {
+    // Simpan PERMANEN ke Firestore — await agar tidak terminate sebelum selesai
+    const saved = await fsSet('soal_bank', docId, questions, {
       examType:type, subtest:sub, batchIndex:bIdx, count:questions.length,
-    }).then(ok => console.log(`DB ${ok?'saved':'FAIL'}: ${docId}`))
-      .catch(e => console.warn('DB save error:', e.message));
+    }).catch(e => { console.warn('DB save error:', e.message); return false; });
+    console.log(`DB ${saved?'saved':'FAIL'}: ${docId}`);
 
     return res.status(200).json({
       success:true, examType:type, subtest:sub,
       count:questions.length, questions,
       source:'generated', modelUsed:model,
+      dbSaved:saved,
     });
   } catch(err) {
     console.error('Generate error:', err.message);
