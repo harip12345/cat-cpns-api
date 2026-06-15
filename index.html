@@ -282,76 +282,71 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
 @media(max-width:768px){
-  /* ══ MOBILE EXAM: 1 scroll, topbar selalu terlihat ══ */
+  /* ── Halaman non-ujian: scroll normal, tidak ada fixed/sticky ── */
+  .lb-container{padding-top:16px}
+  .subtest-selector{padding-top:16px}
+  .hasil-container{padding-top:16px}
 
-  /* Navbar & topbar: sticky di atas, tidak hilang saat scroll */
-  .top-navbar{position:sticky;top:0;z-index:100}
-  .exam-topbar{
-    position:sticky;top:58px;z-index:90;
-    flex-wrap:nowrap;gap:6px;padding:7px 12px;
-    background:#fff;
-  }
-
-  /* Exam layout: flex column, full viewport, 1 scroll total */
-  .exam-layout{
+  /* ── HALAMAN UJIAN: layout fixed 1-scroll ── */
+  /* Hanya berlaku di dalam #view-ujian */
+  #view-ujian{
     display:flex;
     flex-direction:column;
-    grid-template-columns:unset;
-    min-height:unset;
-    /* Tinggi = viewport - navbar - topbar - navbottom */
-    height:calc(100dvh - 58px - 52px - 54px);
+    height:100dvh;
     overflow:hidden;
+    position:fixed; /* kunci: page tidak bisa scroll */
+    top:0;left:0;right:0;bottom:0;
   }
-
-  /* Question panel: scroll DI DALAM panel ini saja */
+  /* Navbar di dalam ujian: sticky di atas */
+  #view-ujian .top-navbar{
+    position:relative;
+    flex-shrink:0;
+  }
+  .exam-topbar{
+    position:relative;
+    flex-shrink:0;
+    flex-wrap:nowrap;gap:6px;padding:7px 12px;
+  }
+  /* Exam layout mengisi sisa ruang */
+  .exam-layout{
+    display:flex;flex-direction:column;
+    grid-template-columns:unset;min-height:unset;
+    flex:1;overflow:hidden;
+  }
+  /* Soal: satu-satunya yang scroll */
   .question-panel{
-    order:1;
-    flex:1 1 0;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    padding:12px 13px 8px;
-    min-height:0;
+    order:1;flex:1 1 0;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:12px 13px 8px;min-height:0;
     background:var(--light);
   }
-
-  /* Nav panel: tinggi tetap, scroll sendiri di dalam */
+  /* Navigasi: fixed height, scroll sendiri */
   .nav-panel{
-    order:2;
-    flex:0 0 200px;
-    height:200px;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    position:static;
-    border-left:none;
+    order:2;flex:0 0 195px;height:195px;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    position:static;border-left:none;
     border-top:1.5px solid var(--border);
     padding:10px 12px 6px;
   }
-
-  /* Nav bottom: sticky ke bawah */
+  /* Nav bottom: di bawah nav panel (bukan fixed, agar tidak overlap) */
   .nav-bottom{
-    position:fixed;bottom:0;left:0;right:0;
+    position:relative;flex-shrink:0;
     width:100%;padding:7px 10px;gap:5px;
-    z-index:80;border-top:1.5px solid var(--border);
+    border-top:1.5px solid var(--border);
+    box-shadow:none;
   }
-
   /* Soal grid */
   .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
-
-  /* Buttons */
+  /* Tombol */
   .btn-nav{padding:7px 8px;font-size:.74rem;min-width:0}
   .btn-add-soal{padding:7px 8px;font-size:.71rem;min-width:0}
-  .btn-finish{padding:6px 9px;font-size:.74rem}
+  .btn-finish{font-size:.72rem;padding:6px 8px}
   .btn-selesai-final{padding:7px 8px;font-size:.74rem}
-
-  /* Timer & topbar lebih compact */
+  /* Timer compact */
   .timer-value{font-size:1rem}
   .timer-box{padding:5px 10px;gap:6px}
   .exam-info-section{font-size:.85rem}
   .exam-info-type{font-size:.65rem}
-  .btn-finish{font-size:.72rem;padding:6px 8px}
-
-  /* Hapus margin-top exam-layout (tidak perlu karena sticky) */
-  #view-ujian .exam-layout{margin-top:0}
 }
 
 @media(max-width:480px){
@@ -838,63 +833,55 @@ function goToStep2() {
     step2Title.textContent = 'Pilih Subtest Awal SKD';
     step2Desc.textContent  = `Halo ${nama}! Mulai dari subtest mana?`;
     btnsEl.innerHTML = `
-      <div style="font-size:.72rem;color:var(--textsub);margin-bottom:10px;line-height:1.5">
-        Pilih subtest dan sumber soal. <strong>Database</strong> = soal tersimpan (cepat). <strong>AI</strong> = generate soal baru.
-      </div>
+      <p style="font-size:.75rem;color:var(--textsub);margin-bottom:12px;line-height:1.5;background:var(--light);padding:8px 10px;border-radius:8px">
+        💡 <strong>Database</strong> = soal tersimpan, langsung masuk ujian.<br/>
+        <strong>🤖 Generate AI</strong> = buat soal baru, timpa database.
+      </p>
       ${[
-        {key:'TWK', icon:'📝', label:'TWK — Tes Wawasan Kebangsaan', sub:'30 soal'},
-        {key:'TIU', icon:'🧮', label:'TIU — Tes Intelejensi Umum',   sub:'35 soal'},
-        {key:'TKP', icon:'🤝', label:'TKP — Tes Karakteristik Pribadi', sub:'45 soal'},
+        {key:'TWK', icon:'📝', label:'TWK', desc:'Tes Wawasan Kebangsaan · 30 soal'},
+        {key:'TIU', icon:'🧮', label:'TIU', desc:'Tes Intelejensi Umum · 35 soal'},
+        {key:'TKP', icon:'🤝', label:'TKP', desc:'Tes Karakteristik Pribadi · 45 soal'},
       ].map(st => `
-        <div style="background:var(--light);border-radius:10px;padding:12px;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <span style="font-size:1.2rem">${st.icon}</span>
-            <div>
-              <div style="font-weight:700;font-size:.88rem">${st.label}</div>
-              <div style="font-size:.72rem;color:var(--textsub)">${st.sub}</div>
-            </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:1.3rem;width:32px;text-align:center;flex-shrink:0">${st.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:.9rem;color:var(--text)">${st.label}</div>
+            <div style="font-size:.72rem;color:var(--textsub);margin-top:1px">${st.desc}</div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="display:flex;gap:5px;flex-shrink:0">
             <button onclick="startFromModal('skd','${st.key}','db')"
-              style="padding:8px;border:1.5px solid var(--blue2);background:#fff;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--blue2);transition:all .15s"
-              onmouseover="this.style.background='var(--blue2)';this.style.color='#fff'"
-              onmouseout="this.style.background='#fff';this.style.color='var(--blue2)'">
-              📦 Database
+              style="padding:7px 12px;border:none;background:var(--blue);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
+              📦 DB
             </button>
             <button onclick="startFromModal('skd','${st.key}','generate')"
-              style="padding:8px;border:1.5px solid var(--red);background:#fff;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--red);transition:all .15s"
-              onmouseover="this.style.background='var(--red)';this.style.color='#fff'"
-              onmouseout="this.style.background='#fff';this.style.color='var(--red)'">
-              🤖 Generate AI
+              style="padding:7px 12px;border:none;background:var(--red);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
+              🤖 AI
             </button>
           </div>
         </div>
-      `).join('')}`;
+      `).join('')}
+      <div style="margin-top:4px"></div>`;
   } else {
     step2Title.textContent = 'Konfirmasi SKB Akuntansi';
     step2Desc.textContent  = `Halo ${nama}! Klik mulai untuk memulai SKB Akuntansi.`;
     btnsEl.innerHTML = `
-      <div style="font-size:.72rem;color:var(--textsub);margin-bottom:10px">
-        Pilih sumber soal SKB Akuntansi (100 soal · Timer 90 menit).
-      </div>
-      <div style="background:var(--light);border-radius:10px;padding:12px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span style="font-size:1.2rem">📊</span>
-          <div><div style="font-weight:700;font-size:.88rem">SKB — Kompetensi Bidang Akuntansi</div>
-          <div style="font-size:.72rem;color:var(--textsub)">100 soal · Akuntansi Pemerintahan, Perpajakan, Audit</div></div>
+      <p style="font-size:.75rem;color:var(--textsub);margin-bottom:12px;background:var(--light);padding:8px 10px;border-radius:8px;line-height:1.5">
+        💡 <strong>Database</strong> = soal tersimpan. <strong>🤖 Generate AI</strong> = buat soal baru.
+      </p>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+        <div style="font-size:1.3rem;width:32px;text-align:center;flex-shrink:0">📊</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:.9rem;color:var(--text)">SKB Akuntansi</div>
+          <div style="font-size:.72rem;color:var(--textsub);margin-top:1px">100 soal · Akuntansi Pemerintahan, Perpajakan, Audit</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="display:flex;gap:5px;flex-shrink:0">
           <button onclick="startFromModal('skb','SKB','db')"
-            style="padding:8px;border:1.5px solid var(--green);background:#fff;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--green)"
-            onmouseover="this.style.background='var(--green)';this.style.color='#fff'"
-            onmouseout="this.style.background='#fff';this.style.color='var(--green)'">
-            📦 Database
+            style="padding:7px 12px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer">
+            📦 DB
           </button>
           <button onclick="startFromModal('skb','SKB','generate')"
-            style="padding:8px;border:1.5px solid var(--red);background:#fff;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--red)"
-            onmouseover="this.style.background='var(--red)';this.style.color='#fff'"
-            onmouseout="this.style.background='#fff';this.style.color='var(--red)'">
-            🤖 Generate AI
+            style="padding:7px 12px;border:none;background:var(--red);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer">
+            🤖 AI
           </button>
         </div>
       </div>`;
@@ -1138,8 +1125,9 @@ async function addNextBatch() {
     newQ.forEach((q,i) => { q.id=startId+i; q.nilai=q.nilai||{benar:5,salah:0}; });
 
     S.questions.push(...newQ);
-    S.batchDone[currentSt.key] = batchIndex + 1;
+    S.batchDone[currentSt.key] = (S.batchDone[currentSt.key]||0) + 1;
     S.generating = false;
+    console.log(`Batch added: ${currentSt.key} batch ${batchIndex} → ${newQ.length} soal, total: ${S.questions.length}`);
 
     hideLoading();
     renderNavGrid();
@@ -1716,14 +1704,27 @@ Soal lama di database akan ditimpa.`)) return;
       q.nilai = q.nilai || { benar:5, salah:0 };
     });
 
-    // Ganti soal di state (hanya soal di range batch ini untuk subtest ini)
-    let subIdx = 0;
+    // Ganti soal di state — replace PERSIS soal di range batch ini
+    // Soal subtest ini diambil dari state, replace index batch yang sesuai
+    const stQAll = S.questions.filter(q => q.subtest === sub);
+    let subCount = 0;
     S.questions = S.questions.map(q => {
       if (q.subtest !== sub) return q;
-      const myIdx = subIdx++;
-      if (myIdx >= start && myIdx < end) return newQ[myIdx - start];
+      const myIdx = subCount++;
+      // Hanya replace soal di range batch ini
+      if (myIdx >= start && myIdx < start + newQ.length) {
+        return { ...newQ[myIdx - start], id: q.id }; // pertahankan id urut
+      }
       return q;
     });
+    // Jika soal di state lebih sedikit dari yang di-generate (batch baru),
+    // tambahkan soal baru ke state
+    if (stQAll.length < start + newQ.length) {
+      let nextId = S.questions.length + 1;
+      const extraQ = newQ.slice(stQAll.length - start);
+      extraQ.forEach(q => { q.id = nextId++; q.nilai = q.nilai||{benar:5,salah:0}; });
+      S.questions.push(...extraQ);
+    }
 
     S.generating = false;
     hideLoading();
