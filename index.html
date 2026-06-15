@@ -99,8 +99,6 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .timer-box.warning{background:var(--yellow)}
 .timer-box.danger{background:var(--red);animation:pulse-t 1s infinite}
 @keyframes pulse-t{0%,100%{opacity:1}50%{opacity:.75}}
-.timer-label{font-size:.68rem;opacity:.8}
-.timer-value{font-size:1.35rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
 .btn-finish{background:var(--red);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:.83rem;font-weight:700;cursor:pointer}
 .btn-finish:hover{opacity:.85}
 .exam-layout{display:grid;grid-template-columns:1fr 290px;min-height:calc(100vh - 126px)}
@@ -109,7 +107,10 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .question-number-badge{background:var(--blue);color:#fff;border-radius:8px;padding:5px 13px;font-size:.83rem;font-weight:700}
 .question-subtest-badge{background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 11px;font-size:.76rem;font-weight:600}
 .question-flag-badge{background:#fff8e1;color:var(--yellow);border:1.5px solid var(--yellow);border-radius:8px;padding:4px 11px;font-size:.76rem;font-weight:600;display:none}
-.btn-show-key{margin-left:auto;background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 12px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-chat-ai{margin-left:auto;background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 12px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn-chat-ai:hover{background:var(--blue2);color:#fff}
+.btn-chat-ai.open{background:var(--blue2);color:#fff}
+.btn-show-key{background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 12px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-show-key:hover{background:var(--blue2);color:#fff}
 .btn-show-key.revealed{background:var(--blue2);color:#fff}
 .kunci-jawaban-box{background:linear-gradient(135deg,#e8f0fe,#f0f7ff);border:2px solid var(--blue2);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px;animation:fadeIn .2s ease}
@@ -142,7 +143,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .btn-next:hover{background:var(--blue2)}
 .btn-nav:disabled{opacity:.4;cursor:not-allowed}
 
-/* Tombol tambah soal — di nav bottom */
+/* Tombol tambah soal */
 .btn-add-soal{background:linear-gradient(135deg,var(--green),#27ae60);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;animation:glow-green 2s infinite}
 .btn-add-soal:hover{opacity:.88}
 .btn-add-soal:disabled{opacity:.4;cursor:not-allowed;animation:none;background:var(--gray)}
@@ -230,6 +231,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 
 .btn-selesai-final{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:.84rem;font-weight:700;cursor:pointer;margin-left:auto;animation:pulse-red 1.5s infinite}
 @keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}70%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
+
 /* ═══ MODAL NAMA ═══════════════════════════════════════════ */
 .modal-nama-body{padding:22px}
 .modal-nama-body h3{font-size:1rem;font-weight:800;margin-bottom:6px}
@@ -281,6 +283,32 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-refresh:hover{opacity:.88}
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
+/* ═══ CHAT AI DRAWER ════════════════════════════════════════════ */
+.chat-drawer{position:fixed;bottom:0;right:0;width:360px;height:480px;background:#fff;border-radius:16px 0 0 0;box-shadow:-4px -4px 24px rgba(0,53,128,.18);display:flex;flex-direction:column;z-index:200;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:3px solid var(--blue2);border-left:1.5px solid var(--border)}
+.chat-drawer.show{transform:translateY(0)}
+.chat-drawer-header{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 0 0 0;flex-shrink:0}
+.chat-drawer-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem}
+.chat-drawer-title-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:blink-dot 2s infinite}
+@keyframes blink-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.chat-drawer-ctx{font-size:.68rem;opacity:.8;margin-top:1px}
+.btn-chat-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.btn-chat-close:hover{background:rgba(255,255,255,.3)}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-bubble{max-width:86%;padding:9px 13px;border-radius:12px;font-size:.82rem;line-height:1.6;animation:fadeInUp .2s ease}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.chat-bubble.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:3px}
+.chat-bubble.ai{align-self:flex-start;background:var(--light);color:var(--text);border-bottom-left-radius:3px;border:1px solid var(--border)}
+.chat-bubble.typing{color:var(--textsub);font-style:italic}
+.chat-quick-btns{padding:6px 14px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--border);flex-shrink:0}
+.chat-quick-btn{background:#e8f0fe;color:var(--blue2);border:none;border-radius:10px;padding:4px 9px;font-size:.7rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.chat-quick-btn:hover{background:var(--blue2);color:#fff}
+.chat-input-row{padding:10px 12px;display:flex;gap:7px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.83rem;font-family:inherit;outline:none;resize:none;height:38px;max-height:100px;transition:border-color .2s;overflow-y:auto}
+.chat-input:focus{border-color:var(--blue2)}
+.btn-chat-send{background:var(--blue2);color:#fff;border:none;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.btn-chat-send:hover{opacity:.85}
+.btn-chat-send:disabled{opacity:.4;cursor:not-allowed}
+
 @media(max-width:768px){
   /* ── Non-ujian pages: normal scroll ── */
   .lb-container{padding-top:12px}
@@ -294,56 +322,51 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     height:100dvh;
     overflow:hidden;
   }
-  /* Topbar sticky di atas, selalu terlihat */
   .view-ujian-active .exam-topbar{
     flex-shrink:0;
     flex-wrap:nowrap;gap:6px;padding:7px 12px;
     position:sticky;top:0;z-index:90;
   }
-  /* exam-layout: satu kolom */
   .view-ujian-active .exam-layout{
     display:block;
     grid-template-columns:unset;min-height:unset;
     flex:1;
-    overflow-y:auto;           /* SATU scroll di sini */
+    overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
-  /* Question panel: tidak ada scroll sendiri, ikut parent */
   .view-ujian-active .question-panel{
     overflow:visible;
     padding:12px 13px 0;
     min-height:unset;
     background:var(--light);
   }
-  /* Nav panel: tidak ada scroll sendiri, tidak ada border pemisah */
   .view-ujian-active .nav-panel{
     overflow:visible;
     height:auto;
     position:static;border-left:none;
-    border-top:none;           /* hapus garis pemisah */
-    padding:8px 13px 80px;    /* padding bawah untuk nav-bottom */
+    border-top:none;
+    padding:8px 13px 80px;
     background:var(--light);
   }
-  /* Nav bottom: fixed di bawah */
   .view-ujian-active .nav-bottom{
     position:fixed;bottom:0;left:0;right:0;
     width:100%;padding:8px 10px;gap:5px;
     border-top:1.5px solid var(--border);
     background:#fff;z-index:80;
   }
-  /* Soal grid */
   .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px;overflow-x:auto}
-  /* Tombol nav — lebih besar agar mudah diklik di HP */
   .btn-nav{padding:11px 14px;font-size:.82rem;min-width:44px;min-height:44px}
   .btn-flag{padding:11px 12px;font-size:.82rem;min-height:44px}
   .btn-add-soal{padding:10px 12px;font-size:.78rem;min-height:44px}
   .btn-finish{font-size:.78rem;padding:10px 12px;min-height:44px}
   .btn-selesai-final{padding:10px 12px;font-size:.78rem;min-height:44px}
-  /* Timer compact */
   .timer-value{font-size:1rem}
   .timer-box{padding:5px 10px;gap:6px}
   .exam-info-section{font-size:.85rem}
   .exam-info-type{font-size:.65rem}
+  /* Chat drawer full width di mobile */
+  .chat-drawer{width:100%;height:65dvh;border-radius:16px 16px 0 0;border-left:none;border-top:3px solid var(--blue2)}
+  .chat-drawer-header{border-radius:14px 14px 0 0}
 }
 
 @media(max-width:480px){
@@ -418,7 +441,6 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 <div class="modal-overlay" id="modal-nama">
   <div class="modal-box">
     <div class="modal-header" id="modal-nama-header">👤 Identitas Peserta</div>
-    <!-- Step 1: Input nama -->
     <div id="modal-step1" class="modal-nama-body">
       <h3>Masukkan nama Anda</h3>
       <p>Nama akan ditampilkan di papan peringkat setelah ujian selesai.</p>
@@ -428,7 +450,6 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <button class="btn-modal-confirm" onclick="goToStep2()">Lanjut →</button>
       </div>
     </div>
-    <!-- Step 2: Pilih ujian (muncul setelah nama diisi) -->
     <div id="modal-step2" class="modal-nama-body" style="display:none">
       <h3 id="modal-step2-title">Pilih Jenis Ujian</h3>
       <p id="modal-step2-desc">Pilih jenis ujian dan subtest awal:</p>
@@ -552,6 +573,10 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <div class="question-number-badge" id="q-number-badge">Soal 1</div>
         <div class="question-subtest-badge" id="q-subtest-badge">TWK</div>
         <div class="question-flag-badge" id="q-flag-badge">🚩 Ragu-ragu</div>
+        <!-- TOMBOL CHAT AI — di sebelah kiri tombol Kunci -->
+        <button class="btn-chat-ai" id="btn-chat-ai" onclick="toggleChat()" title="Tanya Asisten AI">
+          💬 Tanya AI
+        </button>
         <button class="btn-show-key" id="btn-show-key" onclick="toggleKunciJawaban()" title="Lihat kunci jawaban">
           🔑 Kunci
         </button>
@@ -569,7 +594,6 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <div class="progress-label"><span>Terjawab</span><span id="progress-text">0/0</span></div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
       </div>
-      <!-- Status per subtest -->
       <div class="subtest-status" id="subtest-status"></div>
       <div class="section-tabs" id="section-tabs"></div>
       <div class="soal-grid" id="soal-grid"></div>
@@ -667,14 +691,42 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   </div>
 </div>
 
+<!-- ═══ CHAT AI DRAWER ════════════════════════════════════════ -->
+<div class="chat-drawer" id="chat-drawer">
+  <div class="chat-drawer-header">
+    <div>
+      <div class="chat-drawer-title">
+        <span>🤖 Asisten CPNS</span>
+        <div class="chat-drawer-title-dot"></div>
+      </div>
+      <div class="chat-drawer-ctx" id="chat-ctx-label">Tanya apa saja seputar materi CPNS</div>
+    </div>
+    <button class="btn-chat-close" onclick="toggleChat()" title="Tutup">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-bubble ai">👋 Halo! Saya Asisten CPNS kamu. Tanya materi TWK, TIU, TKP, atau minta penjelasan soal yang sedang kamu kerjakan!</div>
+  </div>
+  <div class="chat-quick-btns">
+    <button class="chat-quick-btn" onclick="chatQuick('Jelaskan soal ini')">💡 Jelaskan soal ini</button>
+    <button class="chat-quick-btn" onclick="chatQuick('Apa kunci jawaban & alasannya?')">🔑 Kunci & alasan</button>
+    <button class="chat-quick-btn" onclick="chatQuick('Tips menjawab soal TKP')">🎯 Tips TKP</button>
+    <button class="chat-quick-btn" onclick="chatQuick('Strategi passing grade SKD')">📊 Strategi PG</button>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Tanya materi, minta pembahasan soal..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+      oninput="this.style.height='38px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="btn-chat-send" id="btn-chat-send" onclick="sendChat()" title="Kirim">➤</button>
+  </div>
+</div>
+
 <script>
 // =============================================================
 // CONFIG
 // =============================================================
 const BASE_URL = 'https://cat-cpns-api.vercel.app';
-const BATCH    = 10; // soal per-generate
+const BATCH    = 10;
 
-// Konfigurasi subtest per exam type
 const EXAM_CFG = {
   skd: {
     timer: 100 * 60,
@@ -708,6 +760,124 @@ let S = {
   generating:     false,
 };
 
+// =============================================================
+// CHAT AI STATE
+// =============================================================
+let chatHistory = [];
+let chatOpen    = false;
+let chatLoading = false;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const drawer = document.getElementById('chat-drawer');
+  const btnAI  = document.getElementById('btn-chat-ai');
+  drawer.classList.toggle('show', chatOpen);
+  if (btnAI) btnAI.classList.toggle('open', chatOpen);
+  if (chatOpen) {
+    updateChatContext();
+    setTimeout(() => document.getElementById('chat-input')?.focus(), 300);
+    scrollChatBottom();
+  }
+}
+
+function updateChatContext() {
+  const ctxEl = document.getElementById('chat-ctx-label');
+  if (!ctxEl) return;
+  if (!S.questions.length) {
+    ctxEl.textContent = 'Tanya apa saja seputar materi CPNS';
+    return;
+  }
+  const q = S.questions[S.currentQ];
+  if (q) ctxEl.textContent = 'Konteks: Soal ' + (S.currentQ + 1) + ' — ' + (q.subtestFull || q.subtest);
+}
+
+function buildQuestionContext() {
+  if (!S.questions.length) return null;
+  const q   = S.questions[S.currentQ];
+  const jaw = S.userAnswers[S.currentQ];
+  return {
+    nomor:             S.currentQ + 1,
+    subtest:           q.subtest,
+    subtestFull:       q.subtestFull || q.subtest,
+    text:              q.text,
+    tipe:              q.tipe,
+    options:           q.options,
+    kunciJawaban:      q.kunciJawaban || null,
+    pembahasanSingkat: q.pembahasanSingkat || null,
+    nilaiOpsi:         q.nilaiOpsi || null,
+    jawaban:           jaw || null,
+  };
+}
+
+function addChatBubble(role, text) {
+  const el = document.createElement('div');
+  el.className = 'chat-bubble ' + role;
+  el.textContent = text;
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChatBottom();
+  return el;
+}
+
+function scrollChatBottom() {
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+async function sendChat(overrideText) {
+  if (chatLoading) return;
+  const input = document.getElementById('chat-input');
+  const text  = (overrideText || input?.value || '').trim();
+  if (!text) return;
+
+  if (input && !overrideText) { input.value = ''; input.style.height = '38px'; }
+
+  addChatBubble('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  // Typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-bubble ai typing';
+  typingEl.textContent = '⏳ Sedang mengetik...';
+  document.getElementById('chat-messages').appendChild(typingEl);
+  scrollChatBottom();
+
+  chatLoading = true;
+  const sendBtn = document.getElementById('btn-chat-send');
+  if (sendBtn) sendBtn.disabled = true;
+
+  try {
+    const res = await fetch(BASE_URL + '/api/chat', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        messages:        chatHistory,
+        questionContext: buildQuestionContext(),
+      }),
+    });
+    const data = await res.json();
+    typingEl.remove();
+    if (data.success) {
+      addChatBubble('ai', data.reply);
+      chatHistory.push({ role: 'assistant', content: data.reply });
+      // Batasi history agar tidak terlalu panjang
+      if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+    } else {
+      addChatBubble('ai', '⚠️ Maaf, terjadi kesalahan: ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    typingEl.remove();
+    addChatBubble('ai', '⚠️ Gagal terhubung ke server. Cek koneksi internet kamu.');
+  }
+
+  chatLoading = false;
+  if (sendBtn) sendBtn.disabled = false;
+  document.getElementById('chat-input')?.focus();
+}
+
+function chatQuick(text) {
+  sendChat(text);
+}
+
 // ── Leaderboard state ────────────────────────────────────────
 let lbCurrentTab = 'skd';
 
@@ -731,8 +901,6 @@ async function loadLeaderboard() {
   }
 }
 
-// showView sudah dideklarasikan di atas, tambah leaderboard hook di sini
-
 function renderLeaderboard(entries) {
   if (!entries.length) {
     document.getElementById('lb-content').innerHTML =
@@ -741,7 +909,6 @@ function renderLeaderboard(entries) {
   }
 
   const medals = ['🥇','🥈','🥉'];
-  const rankClass = ['gold','silver','bronze'];
 
   const rows = entries.map((e,i) => {
     const rank = i+1;
@@ -787,12 +954,10 @@ function renderLeaderboard(entries) {
 }
 
 // ── Modal nama 2-step ────────────────────────────────────────
-// pendingExamType diset saat user klik tombol SKD/SKB di menu
 let pendingExamType = null;
 
 function openModalNama(examType) {
   pendingExamType = examType;
-  // Reset ke step 1
   document.getElementById('modal-step1').style.display = 'block';
   document.getElementById('modal-step2').style.display = 'none';
   document.getElementById('modal-nama-header').textContent = '👤 Identitas Peserta';
@@ -820,9 +985,8 @@ function goToStep2() {
   }
   S.namaPeserta = nama;
 
-  // Bangun tombol pilihan sesuai examType
-  const examType = pendingExamType;
-  const btnsEl   = document.getElementById('exam-select-btns');
+  const examType   = pendingExamType;
+  const btnsEl     = document.getElementById('exam-select-btns');
   const step2Title = document.getElementById('modal-step2-title');
   const step2Desc  = document.getElementById('modal-step2-desc');
 
@@ -888,7 +1052,7 @@ async function startFromModal(examType, startSubtest) {
   await quickStart(examType, startSubtest, 'db');
 }
 
-// ── Simpan hasil ke leaderboard setelah submit ───────────────
+// ── Simpan hasil ke leaderboard ───────────────────────────────
 async function saveToLeaderboard(examType, totalSkor, skorDetail) {
   try {
     await fetch(`${BASE_URL}/api/leaderboard`, {
@@ -906,7 +1070,6 @@ async function saveToLeaderboard(examType, totalSkor, skorDetail) {
         device:     navigator.userAgent.substring(0,50),
       }),
     });
-    console.log('Leaderboard saved');
   } catch(e) { console.warn('Leaderboard save failed:', e.message); }
 }
 
@@ -941,9 +1104,8 @@ document.getElementById('modal-finish').addEventListener('click', e=>{
 });
 
 // =============================================================
-// QUICK START — langsung generate batch pertama & masuk ujian
+// QUICK START
 // =============================================================
-// mode: 'db' = hanya dari database | 'generate' = generate baru batch pertama
 async function quickStart(examType, startSubtest, mode = 'db') {
   S.examType    = examType;
   S.questions   = [];
@@ -952,6 +1114,10 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   S.currentQ    = 0;
   S.batchDone   = {};
   S.generating  = false;
+  // Reset chat saat mulai ujian baru
+  chatHistory   = [];
+  chatOpen      = false;
+  document.getElementById('chat-drawer').classList.remove('show');
   EXAM_CFG[examType].subtests.forEach(st => { S.batchDone[st.key] = 0; });
 
   const cfg          = EXAM_CFG[examType];
@@ -960,7 +1126,6 @@ async function quickStart(examType, startSubtest, mode = 'db') {
 
   showLoading('Memeriksa soal di database...');
 
-  // ── Load semua batch secara PARALLEL (lebih cepat) ──────────
   setLoadingMsg('Memeriksa soal di database...');
   const loadPromises = [];
   for (const st of cfg.subtests) {
@@ -975,7 +1140,6 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   }
   const results = await Promise.all(loadPromises);
 
-  // Susun soal berurutan per subtest per batch
   const bySubtest = {};
   cfg.subtests.forEach(st => { bySubtest[st.key] = []; });
   results.forEach(({ st, b, qs }) => {
@@ -986,16 +1150,14 @@ async function quickStart(examType, startSubtest, mode = 'db') {
     const batches = Math.ceil(st.total / BATCH);
     for (let b = 0; b < batches; b++) {
       const qs = bySubtest[st.key][b];
-      if (!qs) break; // stop di gap pertama
+      if (!qs) break;
       qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
       allQuestions.push(...qs);
       S.batchDone[st.key] = b + 1;
     }
   });
 
-  // ── Jika DB kosong dan mode generate → generate batch pertama ─
-    if (allQuestions.length === 0) {
-    // DB kosong → otomatis generate AI tanpa konfirmasi
+  if (allQuestions.length === 0) {
     setLoadingMsg(`Database kosong, generating soal ${startSubtest} dari AI...`);
     try {
       const qs = await fetchSoal(examType, startSubtest, BATCH, 0, false);
@@ -1014,12 +1176,14 @@ async function quickStart(examType, startSubtest, mode = 'db') {
 
   hideLoading();
   showView('ujian');
-  // Tambah class mobile layout saat ujian aktif
   document.getElementById('view-ujian').classList.add('view-ujian-active');
   document.getElementById('exam-type-label').textContent = examType.toUpperCase();
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
-  // Tambah class exam-mode ke body untuk offset fixed headers di mobile
+
+  // Reset chat messages ke sambutan awal
+  document.getElementById('chat-messages').innerHTML =
+    '<div class="chat-bubble ai">👋 Halo ' + S.namaPeserta + '! Saya siap bantu kamu. Klik soal lalu tekan "💡 Jelaskan soal ini" untuk mulai!</div>';
 
   renderNavGrid();
   renderQuestion(0);
@@ -1034,11 +1198,10 @@ function setLoadingMsg(msg) {
 }
 
 // =============================================================
-// FETCH SOAL dari Vercel API
+// FETCH SOAL
 // =============================================================
 async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
   const controller = new AbortController();
-  // DB fetch timeout 8 detik, generate timeout 55 detik
   const timeout = forceNew ? 55000 : 8000;
   const timer   = setTimeout(() => controller.abort(), timeout);
 
@@ -1060,7 +1223,6 @@ async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
   } catch(e) {
     clearTimeout(timer);
     if (e.name === 'AbortError') {
-      // Timeout DB = anggap tidak ada, bukan error
       if (!forceNew) return [];
       throw new Error('Generate timeout — coba lagi.');
     }
@@ -1069,7 +1231,7 @@ async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
 }
 
 // =============================================================
-// TAMBAH BATCH SOAL — dipanggil dari tombol ➕ di nav bottom
+// TAMBAH BATCH SOAL
 // =============================================================
 async function addNextBatch() {
   if (S.generating) return;
@@ -1077,12 +1239,11 @@ async function addNextBatch() {
   const { examType } = S;
   const cfg          = EXAM_CFG[examType];
 
-  // Cari subtest yang belum selesai (belum mencapai total)
   const currentSt = cfg.subtests.find(st => {
     const collected = S.questions.filter(q => q.subtest === st.key).length;
     return collected < st.total;
   });
-  if (!currentSt) return; // semua sudah lengkap
+  if (!currentSt) return;
 
   const collected  = S.questions.filter(q => q.subtest === currentSt.key).length;
   const remaining  = currentSt.total - collected;
@@ -1097,20 +1258,17 @@ async function addNextBatch() {
   try {
     const newQ = await fetchSoal(examType, currentSt.key, count, batchIndex, false);
 
-    // Assign ID lanjutan
     const startId = S.questions.length + 1;
     newQ.forEach((q,i) => { q.id=startId+i; q.nilai=q.nilai||{benar:5,salah:0}; });
 
     S.questions.push(...newQ);
     S.batchDone[currentSt.key] = (S.batchDone[currentSt.key]||0) + 1;
     S.generating = false;
-    console.log(`Batch added: ${currentSt.key} batch ${batchIndex} → ${newQ.length} soal, total: ${S.questions.length}`);
 
     hideLoading();
     renderNavGrid();
     updateAddBtn();
 
-    // Arahkan ke soal baru jika user sedang di soal terakhir
     if (S.currentQ === startId - 2) renderQuestion(startId - 1);
     else renderQuestion(S.currentQ);
 
@@ -1122,7 +1280,6 @@ async function addNextBatch() {
   }
 }
 
-// Update tombol ➕ — tampilkan apa yang akan diambil selanjutnya
 function updateAddBtn() {
   const btn      = document.getElementById('btn-add-soal');
   const labelEl  = document.getElementById('btn-add-label');
@@ -1130,14 +1287,13 @@ function updateAddBtn() {
 
   const cfg = EXAM_CFG[S.examType];
 
-  // Cari subtest berikutnya yang belum lengkap
   const nextSt = cfg.subtests.find(st => {
     const collected = S.questions.filter(q => q.subtest === st.key).length;
     return collected < st.total;
   });
 
   if (!nextSt) {
-    btn.style.display = 'none'; // semua soal sudah lengkap
+    btn.style.display = 'none';
     return;
   }
 
@@ -1148,7 +1304,6 @@ function updateAddBtn() {
   btn.style.display = 'inline-flex';
   btn.disabled      = S.generating;
 
-  // Label kontekstual
   const isNewSubtest = collected === 0;
   labelEl.textContent = isNewSubtest
     ? `Mulai ${nextSt.key} (${count} soal pertama)`
@@ -1187,23 +1342,18 @@ function renderNavGrid() {
 
   const cfg = EXAM_CFG[S.examType];
 
-  // Section tabs — semua subtest dari config (bukan hanya yang sudah ada)
   cfg.subtests.forEach((st, i) => {
     const btn = document.createElement('button');
     btn.className = 'section-tab' + (i===0?' active':'');
     btn.textContent = st.key;
     btn.onclick = () => {
-      // Cari soal pertama subtest ini di questions array
-      // Posisi globalnya = sum total subtest sebelumnya
       let offset = 0;
       for (let j=0; j<i; j++) offset += cfg.subtests[j].total;
-      // Kalau ada soal di posisi itu, navigate ke sana
       if (offset < S.questions.length) renderQuestion(offset);
     };
     tabs.appendChild(btn);
   });
 
-  // Status per subtest
   cfg.subtests.forEach(st => {
     const collected = S.questions.filter(q => q.subtest===st.key).length;
     const isDone    = collected >= st.total;
@@ -1214,44 +1364,7 @@ function renderNavGrid() {
     statusEl.appendChild(row);
   });
 
-  // Grid kotak soal — urut per subtest, termasuk placeholder
-  // Setiap subtest occupies slot tetap sesuai total-nya
-  let globalSlot = 0;
-
-  cfg.subtests.forEach(st => {
-    const stQuestions = S.questions.filter(q => q.subtest === st.key);
-
-    for (let i = 0; i < st.total; i++) {
-      const btn      = document.createElement('button');
-      const slotNum  = globalSlot + i;         // nomor slot global (0-based)
-      const displayN = globalSlot + i + 1;     // nomor tampil (1-based)
-      const q        = stQuestions[i];          // soal di posisi ini (bisa undefined)
-
-      if (q) {
-        // Soal sudah ada — cari index aslinya di S.questions
-        const qIdx = S.questions.indexOf(q);
-        btn.className = 'soal-btn';
-        btn.id        = 'soal-slot-' + slotNum;
-        btn.textContent = displayN;
-        btn.onclick   = () => renderQuestion(qIdx);
-        // Warna berdasarkan status jawaban
-        if (S.flagged.has(qIdx))            btn.classList.add('flagged');
-        else if (S.userAnswers[qIdx] !== undefined) btn.classList.add('answered');
-        if (qIdx === S.currentQ)            btn.classList.add('current');
-      } else {
-        btn.className   = 'soal-btn placeholder';
-        btn.textContent = displayN;
-        btn.title       = `${st.key} soal ${i+1} — belum di-generate`;
-      }
-      grid.appendChild(btn);
-      globalSlot++;
-    }
-    globalSlot = 0; // reset — sudah pakai offset per subtest di atas
-    // Sebenarnya globalSlot harus akumulatif:
-  });
-
-  // Hitung ulang globalSlot dengan benar (patch di atas ada bug)
-  grid.innerHTML = ''; // clear dan render ulang
+  grid.innerHTML = '';
   let gSlot = 0;
   cfg.subtests.forEach(st => {
     const stQ = S.questions.filter(q => q.subtest === st.key);
@@ -1287,7 +1400,6 @@ function updateNavGrid() {
   document.getElementById('progress-text').textContent = ans + '/' + total;
   document.getElementById('progress-bar').style.width  = total>0 ? (ans/total*100)+'%' : '0%';
 
-  // Re-render kotak berdasarkan slot (bukan index questions array)
   const cfg = EXAM_CFG[S.examType];
   if (!cfg) return;
   let gSlot = 0;
@@ -1313,6 +1425,9 @@ function renderQuestion(idx) {
   if (idx >= S.questions.length) return;
   S.currentQ=idx;
   const q=S.questions[idx];
+
+  // Update konteks chat saat pindah soal
+  updateChatContext();
 
   document.getElementById('q-number-badge').textContent  ='Soal '+(idx+1);
   document.getElementById('q-subtest-badge').textContent = q.subtest;
@@ -1342,20 +1457,17 @@ function renderQuestion(idx) {
 
   document.getElementById('btn-prev').disabled = idx === 0;
 
-  // Tombol Next: jika soal terakhir yang sudah ada → tampilkan "Selesai Ujian"
   const nextBtn = document.getElementById('btn-next');
   const isLastQ = idx === S.questions.length - 1;
   const noMoreQ = !EXAM_CFG[S.examType]?.subtests.find(st =>
     (S.questions.filter(q => q.subtest === st.key).length) < st.total
   );
   if (isLastQ && noMoreQ) {
-    // Semua soal sudah di-generate dan ini soal terakhir
     nextBtn.textContent = '⏹ Selesai Ujian';
     nextBtn.className   = 'btn-selesai-final';
     nextBtn.onclick     = openModal;
     nextBtn.disabled    = false;
   } else if (isLastQ) {
-    // Masih ada soal yang bisa di-generate
     nextBtn.textContent = 'Next ▶';
     nextBtn.className   = 'btn-nav btn-next';
     nextBtn.onclick     = () => navigate(1);
@@ -1374,13 +1486,9 @@ function renderQuestion(idx) {
   const isMobile = window.innerWidth <= 768;
 
   if (isMobile) {
-    // ── Mobile: SELALU tampilkan dari atas (soal + pertanyaan) ──────────
-    // 1. Scroll exam-layout ke paling atas
     const examEl = document.querySelector('.exam-layout');
     if (examEl) examEl.scrollTop = 0;
 
-    // 2. Highlight kotak grid TANPA menggeser halaman
-    //    Gunakan scrollLeft pada soal-grid container (horizontal only)
     requestAnimationFrame(() => {
       const cfg2 = EXAM_CFG[S.examType];
       if (!cfg2) return;
@@ -1396,7 +1504,6 @@ function renderQuestion(idx) {
         const btn = document.getElementById('soal-slot-' + slot);
         const grid = document.getElementById('soal-grid');
         if (btn && grid) {
-          // Hanya scroll horizontal di dalam grid — tidak geser halaman sama sekali
           const btnLeft   = btn.offsetLeft;
           const gridWidth = grid.clientWidth;
           const btnWidth  = btn.clientWidth;
@@ -1406,7 +1513,6 @@ function renderQuestion(idx) {
     });
 
   } else {
-    // ── Desktop: scroll nav-panel ke kotak aktif ──
     const cfg2 = EXAM_CFG[S.examType];
     if (cfg2) {
       let g = 0, slot = -1;
@@ -1423,8 +1529,8 @@ function renderQuestion(idx) {
       }
     }
   }
-
 }
+
 function toggleKunciJawaban() {
   const q    = S.questions[S.currentQ];
   const kBox = document.getElementById('kunci-jawaban-box');
@@ -1438,10 +1544,8 @@ function toggleKunciJawaban() {
     return;
   }
 
-  // Bangun konten kunci jawaban
   let html = '';
   if (q.tipe === 'tkp') {
-    // TKP: tampilkan semua skor opsi
     const sorted = Object.entries(q.nilaiOpsi || {}).sort((a,b) => b[1]-a[1]);
     const best   = sorted[0];
     html = `
@@ -1489,6 +1593,12 @@ function toggleFlag() {
 function submitExam() {
   closeModal();
   clearInterval(S.timerInterval);
+  // Tutup chat drawer saat selesai ujian
+  chatOpen = false;
+  document.getElementById('chat-drawer').classList.remove('show');
+  const btnAI = document.getElementById('btn-chat-ai');
+  if (btnAI) btnAI.classList.remove('open');
+
   const {questions:qs, userAnswers:ua, examType:et} = S;
 
   if (et==='skd') {
@@ -1523,7 +1633,6 @@ function submitExam() {
       </div>`;
     }).join('');
 
-    // Simpan ke leaderboard
     saveToLeaderboard('skd', total, {TWK:skor.TWK, TIU:skor.TIU, TKP:skor.TKP, lulusAll});
 
     const ob=document.getElementById('overall-status-box');
@@ -1542,7 +1651,6 @@ function submitExam() {
     document.getElementById('score-max').textContent=`dari skor maksimal ${qs.length*5} (${qs.length} soal dikerjakan)`;
     document.getElementById('skd-breakdown').style.display='none';
     document.getElementById('skb-info').style.display='block';
-    // Simpan ke leaderboard
     saveToLeaderboard('skb', total, {});
 
     document.getElementById('skb-desc-text').textContent=
@@ -1555,7 +1663,6 @@ function submitExam() {
     let detailHTML = '';
 
     if (q.tipe === 'tkp') {
-      // TKP — tampilkan skor opsi dan alasan
       const skorUser = jaw ? (q.nilaiOpsi?.[jaw] || 0) : 0;
       const bestOpt  = jaw ? Object.entries(q.nilaiOpsi||{}).sort((a,b)=>b[1]-a[1])[0] : null;
       statusCls = jaw ? 'correct' : 'skip';
@@ -1576,9 +1683,7 @@ function submitExam() {
       } else {
         statusCls = 'wrong'; statusTxt = `${jaw} ✗  (Kunci: ${benar})`;
       }
-      // Tampilkan teks jawaban benar
       const benarTeks = q.options?.[benar] || '';
-      // Pembahasan jika ada
       const pembahasan = q.pembahasanSingkat || q.pembahasan || '';
       detailHTML = `<div class="review-detail">
         <div class="review-correct-ans">✅ Jawaban benar: <strong>${benar}</strong> — ${benarTeks}</div>
@@ -1596,13 +1701,10 @@ function submitExam() {
     </div>`;
   }).join('');
 
-  // Tampilkan nama peserta di halaman hasil
   const namaEl = document.getElementById('hasil-nama');
   if (namaEl && S.namaPeserta) namaEl.textContent = `👤 ${S.namaPeserta}`;
 
-  // Tombol lihat peringkat — cukup 1, insert sebelum review section
   const reviewSec = document.getElementById('review-body').closest('.review-section');
-  // Hapus tombol lama jika ada (prevent duplicate)
   document.querySelectorAll('.btn-lb-hasil').forEach(el => el.remove());
   const lbBtn = document.createElement('button');
   lbBtn.className = 'btn-back-menu btn-lb-hasil';
@@ -1610,7 +1712,6 @@ function submitExam() {
   lbBtn.textContent = '🏆 Lihat Papan Peringkat';
   lbBtn.onclick = () => { lbCurrentTab = S.examType; showView('leaderboard'); };
   reviewSec.parentNode.insertBefore(lbBtn, reviewSec);
-
 
   document.getElementById('view-ujian').classList.remove('view-ujian-active');
   showView('hasil');
@@ -1620,15 +1721,14 @@ function toggleReview(){
   const body=document.getElementById('review-body');
   document.getElementById('review-toggle-icon').textContent=body.classList.toggle('open')?'▲':'▼';
 }
+
 function handleNavbarClick() {
   const view = document.querySelector('.view.active')?.id;
   if (view === 'view-ujian') {
-    // Sedang ujian — minta konfirmasi
     document.getElementById('modal-home').classList.add('show');
   } else if (view === 'view-hasil') {
     goToMenu();
   }
-  // Di menu — tidak perlu action
 }
 function closeModalHome() {
   document.getElementById('modal-home').classList.remove('show');
@@ -1637,7 +1737,6 @@ document.getElementById('modal-home').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-home')) closeModalHome();
 });
 
-// Populate select regen saat masuk ujian
 function populateRegenSelect() {
   const cfg = EXAM_CFG[S.examType];
   const stSel = document.getElementById('select-regen-subtest');
@@ -1688,35 +1787,29 @@ async function regenBatch() {
   const end   = Math.min(start + BATCH, st.total);
   const count = end - start;
 
-  if (!confirm(`Generate ulang ${count} soal ${sub} batch ${batchIndex+1}?
-Soal lama di database akan ditimpa.`)) return;
+  if (!confirm(`Generate ulang ${count} soal ${sub} batch ${batchIndex+1}?\nSoal lama di database akan ditimpa.`)) return;
 
   S.generating = true;
   document.getElementById('btn-regen').disabled = true;
   showLoading(`Generating ulang soal ${sub} batch ${batchIndex+1}...`);
 
   try {
-    const newQ = await fetchSoal(S.examType, sub, count, batchIndex, true); // forceNew=true
+    const newQ = await fetchSoal(S.examType, sub, count, batchIndex, true);
     newQ.forEach((q,i) => {
       q.id    = start + i + 1;
       q.nilai = q.nilai || { benar:5, salah:0 };
     });
 
-    // Ganti soal di state — replace PERSIS soal di range batch ini
-    // Soal subtest ini diambil dari state, replace index batch yang sesuai
     const stQAll = S.questions.filter(q => q.subtest === sub);
     let subCount = 0;
     S.questions = S.questions.map(q => {
       if (q.subtest !== sub) return q;
       const myIdx = subCount++;
-      // Hanya replace soal di range batch ini
       if (myIdx >= start && myIdx < start + newQ.length) {
-        return { ...newQ[myIdx - start], id: q.id }; // pertahankan id urut
+        return { ...newQ[myIdx - start], id: q.id };
       }
       return q;
     });
-    // Jika soal di state lebih sedikit dari yang di-generate (batch baru),
-    // tambahkan soal baru ke state
     if (stQAll.length < start + newQ.length) {
       let nextId = S.questions.length + 1;
       const extraQ = newQ.slice(stQAll.length - start);
@@ -1742,6 +1835,12 @@ function goToMenu(){
   clearInterval(S.timerInterval);
   document.getElementById('modal-home').classList.remove('show');
   document.getElementById('view-ujian').classList.remove('view-ujian-active');
+  // Reset chat saat kembali ke menu
+  chatOpen = false;
+  chatHistory = [];
+  document.getElementById('chat-drawer').classList.remove('show');
+  const btnAI = document.getElementById('btn-chat-ai');
+  if (btnAI) btnAI.classList.remove('open');
 
   const prevNama = S.namaPeserta;
   S={examType:null,namaPeserta:prevNama,questions:[],userAnswers:{},flagged:new Set(),currentQ:0,timeLeft:0,timerInterval:null,batchDone:{},generating:false};
