@@ -27,7 +27,7 @@ const PROMPTS = {
   TWK: `Anda adalah Tim Konsorsium Nasional Penyusun Soal Seleksi CPNS (Gabungan Expert dari BKN, KemenPAN-RB, BPIP, Lemhannas, KPK, dan Badan Pengembangan dan Pembinaan Bahasa), spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi 2024–2025.
 
 FILOSOFI & SUMBER SOAL TWK TERKINI (WAJIB DIPAHAMI):
-Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z). 
+Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z), jadi jangan ada hafalan seperti itu. 
 Soal WAJIB menguji PENALARAN TINGKAT TINGGI (HOTS) dan PEMAHAMAN KONTEKSTUAL. Skenario soal harus mengambil inspirasi dari rilis kasus nyata, kajian, atau dokumen resmi dari lembaga negara terkait.
 
 KISI-KISI RESMI TWK & REFERENSI LEMBAGA SUMBER SOAL:
@@ -95,9 +95,6 @@ KISI-KISI RESMI TIU CPNS & STANDAR DISTRACTOR:
 ━━━ 2. KEMAMPUAN VERBAL (Fokus: Pemahaman Konteks & Silogisme HOTS) ━━━
 • Analogi: Dilarang menggunakan kosakata pasaran. Gunakan padanan kata yang menuntut pemahaman fungsi, hierarki, atau sebab-akibat spesifik (mengacu pada KBBI & Tes Potensi Skolastik BPPP). 
 • Silogisme / Penalaran Logis: Gunakan Modus Ponens, Modus Tollens, dan Silogisme kategoris dengan premis bertumpuk atau premis negatif ("Tidak ada", "Semua bukan"). Skenario harus berupa kebijakan instansi atau aturan kepegawaian.
-
-━━━ 3. KEMAMPUAN FIGURAL (Dideskripsikan via Teks) ━━━
-• Rotasi 2D/3D, pola matriks 3x3, dan pengelompokan gambar (odd one out). Deskripsikan perpindahan elemen secara spesifik (searah jarum jam, penambahan sisi bangun datar, pergantian warna).
 
 ATURAN KETAT PEMBUATAN SOAL & PENGECOH:
 1. Pengecoh numerik WAJIB berasal dari "kesalahan kognitif umum" peserta (misal: lupa membalik perbandingan berbalik nilai, salah menempatkan desimal, atau jawaban dari perhitungan yang baru selesai setengah jalan).
