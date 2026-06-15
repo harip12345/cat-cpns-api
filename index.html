@@ -1371,52 +1371,42 @@ function renderQuestion(idx) {
     document.querySelectorAll('.section-tab').forEach(t=>t.classList.toggle('active',t.textContent===q.subtest));
   }
   updateNavGrid();
+  // Scroll ke atas di mobile — tampilkan soal, bukan kotak grid
   const isMobile = window.innerWidth <= 768;
-
   if (isMobile) {
-    // ── Mobile: scroll exam-layout ke 0 — soal selalu di paling atas ──
-    requestAnimationFrame(() => {
-      // Cari container yang punya overflow:auto (exam-layout di mobile)
-      const el = document.querySelector('.exam-layout');
-      if (el) el.scrollTop = 0;
-    });
+    // Scroll view-ujian ke atas — "Soal X · TWK · Kunci" selalu di paling atas
+    const ujianEl = document.getElementById('view-ujian');
+    if (ujianEl) ujianEl.scrollTop = 0;
+    // Fallback: scroll question-header ke view
+    const qHeader = document.querySelector('.question-header');
+    if (qHeader) qHeader.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
 
-    // Highlight kotak grid — scroll inline saja, tidak geser vertikal
-    requestAnimationFrame(() => {
-      const cfg2 = EXAM_CFG[S.examType];
-      if (!cfg2) return;
-      let g = 0, slot = -1;
-      cfg2.subtests.forEach(st => {
-        const stQ = S.questions.filter(q => q.subtest === st.key);
-        for (let i = 0; i < st.total; i++) {
-          if (stQ[i] && S.questions.indexOf(stQ[i]) === idx) slot = g;
-          g++;
-        }
-      });
-      if (slot >= 0) {
-        const btn = document.getElementById('soal-slot-' + slot);
-        if (btn) btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  // Scroll kotak aktif di nav grid ke posisi terlihat (tanpa scroll halaman)
+  const cfg2 = EXAM_CFG[S.examType];
+  if (cfg2) {
+    let gSlot2 = 0, foundSlot = -1;
+    cfg2.subtests.forEach(st => {
+      const stQ2 = S.questions.filter(q => q.subtest === st.key);
+      for (let i = 0; i < st.total; i++) {
+        if (stQ2[i] && S.questions.indexOf(stQ2[i]) === idx) foundSlot = gSlot2;
+        gSlot2++;
       }
     });
-
-  } else {
-    // ── Desktop: scroll nav-panel ke kotak aktif ──
-    const cfg2 = EXAM_CFG[S.examType];
-    if (cfg2) {
-      let g = 0, slot = -1;
-      cfg2.subtests.forEach(st => {
-        const stQ = S.questions.filter(q => q.subtest === st.key);
-        for (let i = 0; i < st.total; i++) {
-          if (stQ[i] && S.questions.indexOf(stQ[i]) === idx) slot = g;
-          g++;
+    if (foundSlot >= 0) {
+      const ab = document.getElementById('soal-slot-' + foundSlot);
+      if (ab) {
+        if (isMobile) {
+          // Di mobile: scroll hanya di dalam container nav-panel, bukan seluruh halaman
+          const navPanel = document.getElementById('soal-grid');
+          if (navPanel) ab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          ab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      });
-      if (slot >= 0) {
-        const btn = document.getElementById('soal-slot-' + slot);
-        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
   }
+}
 
 function toggleKunciJawaban() {
   const q    = S.questions[S.currentQ];
