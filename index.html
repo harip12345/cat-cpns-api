@@ -332,7 +332,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     background:#fff;z-index:80;
   }
   /* Soal grid */
-  .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
+  .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px;overflow-x:auto}
   /* Tombol nav — lebih besar agar mudah diklik di HP */
   .btn-nav{padding:11px 14px;font-size:.82rem;min-width:44px;min-height:44px}
   .btn-flag{padding:11px 12px;font-size:.82rem;min-height:44px}
@@ -1374,14 +1374,13 @@ function renderQuestion(idx) {
   const isMobile = window.innerWidth <= 768;
 
   if (isMobile) {
-    // ── Mobile: scroll exam-layout ke 0 — soal selalu di paling atas ──
-    requestAnimationFrame(() => {
-      // Cari container yang punya overflow:auto (exam-layout di mobile)
-      const el = document.querySelector('.exam-layout');
-      if (el) el.scrollTop = 0;
-    });
+    // ── Mobile: SELALU tampilkan dari atas (soal + pertanyaan) ──────────
+    // 1. Scroll exam-layout ke paling atas
+    const examEl = document.querySelector('.exam-layout');
+    if (examEl) examEl.scrollTop = 0;
 
-    // Highlight kotak grid — scroll inline saja, tidak geser vertikal
+    // 2. Highlight kotak grid TANPA menggeser halaman
+    //    Gunakan scrollLeft pada soal-grid container (horizontal only)
     requestAnimationFrame(() => {
       const cfg2 = EXAM_CFG[S.examType];
       if (!cfg2) return;
@@ -1395,7 +1394,14 @@ function renderQuestion(idx) {
       });
       if (slot >= 0) {
         const btn = document.getElementById('soal-slot-' + slot);
-        if (btn) btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+        const grid = document.getElementById('soal-grid');
+        if (btn && grid) {
+          // Hanya scroll horizontal di dalam grid — tidak geser halaman sama sekali
+          const btnLeft   = btn.offsetLeft;
+          const gridWidth = grid.clientWidth;
+          const btnWidth  = btn.clientWidth;
+          grid.scrollLeft = btnLeft - (gridWidth / 2) + (btnWidth / 2);
+        }
       }
     });
 
