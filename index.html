@@ -825,8 +825,7 @@ function goToStep2() {
     step2Desc.textContent  = `Halo ${nama}! Mulai dari subtest mana?`;
     btnsEl.innerHTML = `
       <p style="font-size:.75rem;color:var(--textsub);margin-bottom:12px;line-height:1.5;background:var(--light);padding:8px 10px;border-radius:8px">
-        💡 <strong>Database</strong> = soal tersimpan, langsung masuk ujian.<br/>
-        <strong>🤖 Generate AI</strong> = buat soal baru, timpa database.
+        Pilih subtest awal. Soal diambil otomatis dari database.
       </p>
       ${[
         {key:'TWK', icon:'📝', label:'TWK', desc:'Tes Wawasan Kebangsaan · 30 soal'},
@@ -839,16 +838,10 @@ function goToStep2() {
             <div style="font-weight:800;font-size:.9rem;color:var(--text)">${st.label}</div>
             <div style="font-size:.72rem;color:var(--textsub);margin-top:1px">${st.desc}</div>
           </div>
-          <div style="display:flex;gap:5px;flex-shrink:0">
-            <button onclick="startFromModal('skd','${st.key}','db')"
-              style="padding:7px 12px;border:none;background:var(--blue);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
-              📦 DB
-            </button>
-            <button onclick="startFromModal('skd','${st.key}','generate')"
-              style="padding:7px 12px;border:none;background:var(--red);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
-              🤖 AI
-            </button>
-          </div>
+          <button onclick="startFromModal('skd','${st.key}')"
+            style="padding:9px 18px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            ▶ Mulai
+          </button>
         </div>
       `).join('')}
       <div style="margin-top:4px"></div>`;
@@ -857,7 +850,7 @@ function goToStep2() {
     step2Desc.textContent  = `Halo ${nama}! Klik mulai untuk memulai SKB Akuntansi.`;
     btnsEl.innerHTML = `
       <p style="font-size:.75rem;color:var(--textsub);margin-bottom:12px;background:var(--light);padding:8px 10px;border-radius:8px;line-height:1.5">
-        💡 <strong>Database</strong> = soal tersimpan. <strong>🤖 Generate AI</strong> = buat soal baru.
+        Soal diambil otomatis dari database.
       </p>
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
         <div style="font-size:1.3rem;width:32px;text-align:center;flex-shrink:0">📊</div>
@@ -865,16 +858,10 @@ function goToStep2() {
           <div style="font-weight:800;font-size:.9rem;color:var(--text)">SKB Akuntansi</div>
           <div style="font-size:.72rem;color:var(--textsub);margin-top:1px">100 soal · Akuntansi Pemerintahan, Perpajakan, Audit</div>
         </div>
-        <div style="display:flex;gap:5px;flex-shrink:0">
-          <button onclick="startFromModal('skb','SKB','db')"
-            style="padding:7px 12px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer">
-            📦 DB
-          </button>
-          <button onclick="startFromModal('skb','SKB','generate')"
-            style="padding:7px 12px;border:none;background:var(--red);color:#fff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer">
-            🤖 AI
-          </button>
-        </div>
+        <button onclick="startFromModal('skb','SKB')"
+          style="padding:9px 18px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;flex-shrink:0">
+          ▶ Mulai
+        </button>
       </div>`;
   }
 
@@ -890,9 +877,9 @@ document.getElementById('input-nama').addEventListener('keydown', e => {
   if (e.key === 'Enter') goToStep2();
 });
 
-async function startFromModal(examType, startSubtest, mode = 'db') {
+async function startFromModal(examType, startSubtest) {
   closeModalNama();
-  await quickStart(examType, startSubtest, mode);
+  await quickStart(examType, startSubtest, 'db');
 }
 
 // ── Simpan hasil ke leaderboard setelah submit ───────────────
