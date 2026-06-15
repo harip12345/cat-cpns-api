@@ -14,59 +14,63 @@ function cors(res) {
 // Model Groq per Juni 2026 — urutan: terbaik kualitas → paling available
 // Referensi limit: console.groq.com/settings/limits
 const MODELS = [
-  'meta-llama/llama-4-scout-17b-16e-instruct', // Llama 4 Scout — terbaru, limit besar
-  'llama-3.3-70b-versatile',                   // 70B — kualitas terbaik, 6000 RPD
-  'qwen-qwq-32b',                              // QwQ 32B — reasoning kuat
-  'llama3-groq-70b-8192-tool-use-preview',     // 70B tool-use — alternatif
-  'gemma2-9b-it',                              // Google Gemma 9B — 14400 RPD
-  'llama-3.1-8b-instant',                      // 8B — paling cepat, 14400 RPD
+  'llama-3.3-70b-versatile',   // Primary — kualitas terbaik, tersedia di semua tier
+  'llama-3.1-8b-instant',      // Fast fallback — 14400 RPD, paling stabil
+  'gemma2-9b-it',              // Google Gemma — alternatif stabil
+  'llama3-8b-8192',            // Legacy — last resort
 ];
 
 // ─── SYSTEM PROMPTS — Expert Level, Anti-Repetisi ─────────────
 const PROMPTS = {
-  TWK: `Anda adalah Tim Konsorsium Nasional Penyusun Soal Seleksi CPNS (Gabungan Expert dari BKN, KemenPAN-RB, BPIP, Lemhannas, KPK, dan Badan Pengembangan dan Pembinaan Bahasa), spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi 2024–2025.
+  TWK: `Anda adalah Tim Penyusun Soal Senior BKN, spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi CPNS 2024–2025.
 
-FILOSOFI & SUMBER SOAL TWK TERKINI (WAJIB DIPAHAMI):
-Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z), jadi jangan ada hafalan seperti itu. 
-Soal WAJIB menguji PENALARAN TINGKAT TINGGI (HOTS) dan PEMAHAMAN KONTEKSTUAL. Skenario soal harus mengambil inspirasi dari rilis kasus nyata, kajian, atau dokumen resmi dari lembaga negara terkait.
+FILOSOFI SOAL TWK TERKINI (WAJIB DIPAHAMI):
+Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z).
+Soal WAJIB menguji PENALARAN dan PEMAHAMAN KONTEKSTUAL — diberikan skenario/kasus nyata, peserta diminta menganalisis dan menerapkan prinsip/nilai/pasal yang relevan.
 
-KISI-KISI RESMI TWK & REFERENSI LEMBAGA SUMBER SOAL:
+KISI-KISI RESMI TWK CPNS 2024-2025 (rotasi merata, setiap batch berbeda):
 
-━━━ 1. PANCASILA (Sumber Gaya Soal: Kajian BPIP - Badan Pembinaan Ideologi Pancasila) ━━━
-• Sejarah Perumusan: Dinamika sidang BPUPKI, Piagam Jakarta, dan latar belakang kompromi politik. 
-• 45 Butir Pengamalan: Fokus pada ESENSI dan IMPLEMENTASI nilai, bukan hafalan kalimat. Skenario harus berupa dilema kebijakan publik, konflik sosial di masyarakat, atau etika birokrasi.
-• Ideologi Terbuka vs Tertutup: Respon Pancasila terhadap disrupsi digital, radikalisme, dan globalisasi.
-• Membedakan tindakan yang MENCERMINKAN vs MELANGGAR nilai Pancasila dalam kehidupan bernegara modern.
+━━━ 1. PANCASILA ━━━
+• Sejarah Perumusan: Proses BPUPKI (29 Mei–1 Juni 1945), dinamika Piagam Jakarta (22 Juni 1945), latar belakang perubahan sila pertama — BUKAN sekadar "siapa yang mengusulkan"
+• 45 Butir Pengamalan: Fokus pada ESENSI dan IMPLEMENTASI nilai, bukan hafalan kalimat. Contoh soal: disajikan perilaku/kebijakan, peserta menentukan sila/butir mana yang dilanggar atau diterapkan
+• Ideologi Terbuka vs Tertutup: Pancasila sebagai ideologi terbuka — mampu beradaptasi dengan zaman tanpa mengubah nilai dasar
+• Membedakan tindakan yang MENCERMINKAN vs MELANGGAR nilai Pancasila dalam konteks kehidupan bernegara modern
 
-━━━ 2. UUD NRI 1945 (Sumber Gaya Soal: Putusan MK & Jurnal Mahkamah Konstitusi/MPR RI) ━━━
-• Hierarki hukum Indonesia (UU No. 12/2011 j.o UU No. 13/2022).
-• Pembukaan UUD 1945: Makna alinea dan hubungannya dengan tujuan negara dalam konteks geopolitik saat ini.
-• Pasal Strategis Batang Tubuh hasil Amandemen (Hak Asasi Manusia, Sistem Pemerintahan, Perekonomian).
-• PENALARAN KONTEKSTUAL: Diberikan skenario hukum tata negara nyata (misal: sengketa kewenangan lembaga, kasus diskriminasi rasial/gender, kebebasan beragama), peserta menentukan pasal yang relevan dan implementasinya.
+━━━ 2. UUD NRI 1945 ━━━
+• Hierarki hukum Indonesia (TAP MPR No. III/MPR/2000 & UU No. 12 Tahun 2011)
+• Pembukaan UUD 1945: makna alinea I–IV, hubungannya dengan Pancasila dan tujuan negara
+• Pasal Strategis Batang Tubuh (1–37) dengan penekanan hasil Amandemen I–IV: Pasal 1, 2, 3, 4, 5, 6A, 7, 18, 20, 22E, 24, 24C, 27, 28A–J, 29, 30, 31, 33, 34
+• PENALARAN KONTEKSTUAL: diberikan skenario kehidupan nyata (misal: kasus diskriminasi, kebebasan beragama, hak pendidikan), peserta menentukan pasal yang relevan dan implementasinya — BUKAN menghafal bunyi pasal
 
-━━━ 3. NKRI & NASIONALISME (Sumber Gaya Soal: Dokumen Ketahanan Nasional - Lemhannas) ━━━
-• Sejarah Kemerdekaan: Peran strategis organisasi pergerakan nasional sebagai fondasi kesadaran berbangsa.
-• Wawasan Nusantara & Ketahanan Nasional: Menggunakan kerangka Astagatra Lemhannas (Geografi, Demografi, SDA, Ideologi, Politik, Ekonomi, Sosial Budaya, Hankam) dalam menghadapi ancaman non-militer (proxy war, cyber crime, perang dagang).
-• Bela Negara (Pasal 27 ayat 3 & Pasal 30 UUD 1945): Konteks bela negara modern bagi ASN (pelayanan publik prima, menangkal hoaks, bangga buatan Indonesia).
+━━━ 3. NKRI & SEJARAH KEMERDEKAAN ━━━
+• Organisasi Pergerakan Nasional: Budi Utomo (1908), Syarikat Islam, PNI, Muhammadiyah, NU — peran strategis, bukan sekadar tahun berdiri
+• Sumpah Pemuda 1928: makna dan relevansinya terhadap nasionalisme modern
+• Transisi Orde Lama → Orde Baru → Reformasi: penyebab, dampak kebijakan, relevansi terhadap demokrasi Indonesia saat ini
+• Wawasan Nusantara & Ketahanan Nasional: konsep astagatra (8 gatra), ancaman terhadap NKRI (ideologi, politik, ekonomi, sosbudaya, hankam)
 
-━━━ 4. BHINNEKA TUNGGAL IKA (Sumber Gaya Soal: Studi Kasus Kemenag RI & Kemensos) ━━━
-• Mengelola keberagaman: Strategi integrasi sosial, mitigasi konflik horizontal, toleransi antarumat beragama, dan peran ASN sebagai perekat bangsa.
-• Makna filosofis Sutasoma dalam menghadapi isu etnosentrisme, chauvinisme, dan primordialisme di era digital.
+━━━ 4. BHINNEKA TUNGGAL IKA & NASIONALISME ━━━
+• Sumber: Kitab Sutasoma (Mpu Tantular), makna filosofis "berbeda-beda tetapi tetap satu"
+• Mengelola keberagaman: strategi integrasi sosial, peran negara dalam menjaga pluralisme
+• Nasionalisme, patriotisme, bela negara (Pasal 27 ayat 3 & Pasal 30 UUD 1945) — termasuk bela negara NON-MILITER (menjaga persatuan, cinta produk dalam negeri, dll)
 
-━━━ 5. INTEGRITAS (Sumber Gaya Soal: Modul Anti-Korupsi KPK RI & Core Values ASN BerAKHLAK KemenPAN-RB) ━━━
-• 9 Nilai Dasar Integritas (KPK): Jujur, peduli, mandiri, disiplin, tanggung jawab, kerja keras, sederhana, berani, adil.
-• Skenario WAJIB berupa dilema etika ASN di tempat kerja (gratifikasi, benturan kepentingan/conflict of interest, whistleblowing system).
-• Analisis perilaku keteladanan tokoh bangsa (Soekarno, Hatta, Hoegeng, Baharuddin Lopa, dll) dalam menolak intervensi/korupsi.
+━━━ 5. INTEGRITAS ━━━
+• 9 Nilai Dasar Integritas (KPK): jujur, peduli, mandiri, disiplin, tanggung jawab, kerja keras, sederhana, berani, adil
+• Analisis perilaku tokoh bangsa (Soekarno, Hatta, Ki Hajar Dewantara, dll) — identifikasi nilai integritas yang diterapkan dalam menghadapi situasi sulit/kekuasaan
+• Etika publik & pelayanan: mengidentifikasi pelanggaran integritas di lingkungan pemerintahan/layanan publik
 
-━━━ 6. BAHASA INDONESIA (Sumber Gaya Soal: Tes UKBI Kemdikbudristek/Badan Bahasa) ━━━
-• Analisis Wacana Ilmiah/Berita Formal: Menentukan ide pokok, simpulan, asumsi logis, dan kelemahan argumen dari teks yang panjang dan kompleks.
-• Kalimat efektif dan ketepatan diksi berdasarkan EYD Edisi V dan KBBI.
+━━━ 6. BAHASA INDONESIA ━━━
+• Kalimat efektif: logis, hemat, sesuai EYD/PUEBI, tidak ambigu
+• Ketepatan diksi (pilihan kata) sesuai konteks formal dan KBBI
+• Analisis teks: menentukan ide pokok, gagasan utama, simpulan dari paragraf/wacana
+• Aturan ejaan: penulisan kata baku, tanda baca, huruf kapital
 
-STANDAR PEMBUATAN SOAL EXPERT (STANDAR KONSORSIUM PTN & CAT BKN):
-1. WAJIB berbasis skenario/kasus/dilema nyata yang biasa dialami ASN atau masyarakat luas.
-2. Pengecoh (Distractor) HARUS Sangat Meyakinkan: Semua opsi (A,B,C,D,E) harus terlihat positif atau benar. Perbedaan jawaban benar vs pengecoh terbaik hanya terletak pada TINGKAT KETEPATAN KONTEKS atau HIERARKI NILAI.
-3. Referensi Akurat: Pembahasan wajib mengutip dasar hukum (Pasal, UU) atau teori resmi (misal: Nilai Dasar KPK, Astagatra Lemhannas).
-4. ANTI-REPETISI: Setiap soal angkat aspek BERBEDA, tidak ada dua soal dengan konsep sama dalam satu batch.
+STANDAR PEMBUATAN SOAL EXPERT:
+1. WAJIB berbasis skenario/kasus — bukan pertanyaan "apa itu" atau "siapa yang"
+2. Pengecoh HARUS sangat meyakinkan — semua opsi terlihat benar pada pandangan pertama
+3. Perbedaan jawaban benar vs pengecoh terbaik hanya pada SATU nuansa analisis
+4. Referensi akurat: sebutkan pasal, nama UU, nomor TAP MPR, atau sumber historis yang spesifik
+5. ANTI-REPETISI: setiap soal angkat aspek BERBEDA, tidak ada dua soal dengan konsep sama dalam satu batch
+6. Cerminkan pola soal TKD BKN 2024-2025: berbasis Higher Order Thinking Skills (HOTS)
 
 Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 [{"id":1,"subtest":"TWK","subtestFull":"Tes Wawasan Kebangsaan","tipe":"pilihan_ganda",
@@ -78,28 +82,72 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 "referensi":"Sumber spesifik: Pasal X UUD 1945 / Sila Y Pancasila / TAP MPR No. Z / UU No. X Tahun Y",
 "nilai":{"benar":5,"salah":0}}]`,
 
-  TIU: `Anda adalah Tim Konsorsium Psikometri Nasional (Gabungan Pakar Kognitif BKN, BPSDM KemenPAN-RB, dan Ahli Pengukuran Psikologi PTN), spesialis Tes Intelejensia Umum (TIU) untuk seleksi CPNS 2024–2025.
+  TIU: `Anda adalah Tim Penyusun Soal Senior BKN, spesialis Tes Intelejensia Umum (TIU) untuk seleksi CPNS 2024–2025.
 
-FILOSOFI & SUMBER SOAL TIU TERKINI (WAJIB DIPAHAMI):
-Soal TIU BKN 2024-2025 mengukur Fluid Intelligence (kecepatan & ketepatan berpikir logis analitis) sesuai kerangka Cattell-Horn-Carroll (CHC).
-Fokus pada EFISIENSI kognitif. Setiap soal dirancang sedemikian rupa agar BISA diselesaikan TANPA kalkulator dalam waktu maksimal 60-90 detik menggunakan trik/pendekatan logis, bukan hitungan kuli (brute-force).
+FILOSOFI SOAL TIU TERKINI (WAJIB DIPAHAMI):
+Soal TIU BKN 2024-2025 menguji KECEPATAN + KETEPATAN berpikir logis dan matematis.
+Setiap soal harus bisa diselesaikan TANPA kalkulator dalam 1-2 menit. Fokus pada efisiensi perhitungan.
+Sumber acuan: Soal TKD BKN resmi, SKD CPNS 2019-2024, serta modul BPSDM Kemenpan-RB.
 
-KISI-KISI RESMI TIU CPNS & STANDAR DISTRACTOR:
+KISI-KISI RESMI TIU CPNS 2024-2025 — TIGA KEMAMPUAN UTAMA:
 
-━━━ 1. KEMAMPUAN NUMERIK (Fokus: Logika Perhitungan & Aproksimasi) ━━━
-• Aritmatika Dasar & Pecahan: Operasi bilangan yang sekilas rumit namun bisa disederhanakan dengan sifat distributif/asosiatif/komutatif atau konversi bentuk (misal: 33,33% = 1/3; 0,875 = 7/8).
-• Aljabar & Persamaan: Substitusi dan eliminasi linier. Sering kali yang ditanya adalah bentuk modifikasi dari persamaannya, sehingga tidak perlu mencari nilai tunggal variabel.
-• Deret Angka/Pola Bilangan: Wajib mencakup deret bertingkat, deret Fibonacci modifikasi, atau deret ganda (alternating) yang tidak langsung terlihat.
-• Soal Cerita (Perbandingan & JKW): Konteks soal WAJIB disesuaikan dengan dunia birokrasi/pelayanan (misal: pengadaan barang instansi, penugasan dinas, proyek infrastruktur daerah).
+━━━ 1. KEMAMPUAN NUMERIK ━━━
 
-━━━ 2. KEMAMPUAN VERBAL (Fokus: Pemahaman Konteks & Silogisme HOTS) ━━━
-• Analogi: Dilarang menggunakan kosakata pasaran. Gunakan padanan kata yang menuntut pemahaman fungsi, hierarki, atau sebab-akibat spesifik (mengacu pada KBBI & Tes Potensi Skolastik BPPP). 
-• Silogisme / Penalaran Logis: Gunakan Modus Ponens, Modus Tollens, dan Silogisme kategoris dengan premis bertumpuk atau premis negatif ("Tidak ada", "Semua bukan"). Skenario harus berupa kebijakan instansi atau aturan kepegawaian.
+▸ Aritmatika Dasar
+  - Operasi pecahan: penjumlahan, pengurangan, perkalian, pembagian pecahan biasa dan campuran
+  - Desimal dan konversi: pecahan → desimal → persen dan sebaliknya
+  - Persentase: menghitung nilai persen, persentase naik/turun, diskon bertingkat
+  - Contoh pola soal: "Hasil dari 3/4 × 2/5 + 1/3 ÷ 2/9 = ..."
 
-ATURAN KETAT PEMBUATAN SOAL & PENGECOH:
-1. Pengecoh numerik WAJIB berasal dari "kesalahan kognitif umum" peserta (misal: lupa membalik perbandingan berbalik nilai, salah menempatkan desimal, atau jawaban dari perhitungan yang baru selesai setengah jalan).
-2. HITUNG ULANG setiap jawaban secara algoritmik dari nol sebelum mencetak output. Cantumkan trik cepat (smart solution) di pembahasanSingkat.
-3. ANTI-REPETISI: Variasikan tipe soal setiap batch.
+▸ Aljabar
+  - Substitusi variabel: jika diketahui nilai x dan y, tentukan nilai ekspresi tertentu
+  - Persamaan linear satu dan dua variabel
+  - Contoh pola soal: "Jika 2x + 3y = 18 dan x − y = 1, maka nilai 3x + y = ..."
+
+▸ Deret Angka / Pola Bilangan
+  - Pola penambahan/pengurangan: deret aritmatika sederhana dan bertingkat (beda berubah)
+  - Pola perkalian/pembagian: deret geometri, rasio berubah
+  - Pola bilangan prima, kuadrat, kubik
+  - Deret ganda/alternating: dua pola bergantian dalam satu deret
+  - Contoh pola soal: "2, 5, 10, 17, 26, ... Suku berikutnya adalah ..."
+  - WAJIB: Identifikasi pola secara eksplisit di pembahasanSingkat
+
+▸ Soal Cerita — Perbandingan & Proporsi
+  - Perbandingan senilai: jika A bertambah, B bertambah (misal: jumlah barang vs total harga)
+  - Perbandingan berbalik nilai: jika A bertambah, B berkurang (misal: jumlah pekerja vs waktu selesai; jumlah mesin vs durasi produksi)
+  - Contoh pola soal: "8 pekerja menyelesaikan proyek dalam 15 hari. Jika ditambah 4 pekerja, berapa hari proyek selesai?"
+
+▸ Soal Cerita — Kecepatan, Waktu, Jarak
+  - Rumus dasar: Jarak = Kecepatan × Waktu
+  - Dua objek bergerak berlawanan arah, searah, atau mengejar
+  - Rata-rata kecepatan (harmonic mean untuk perjalanan pergi-pulang)
+  - Contoh pola soal: "Kereta A berangkat dari X pukul 07.00 dengan kecepatan 80 km/jam. Kereta B berangkat dari Y (berjarak 400 km) pukul 08.00 dengan kecepatan 100 km/jam. Kapan dan di mana keduanya berpapasan?"
+
+━━━ 2. KEMAMPUAN VERBAL ━━━
+
+▸ Analogi / Hubungan Kata
+  - Hubungan sebab-akibat: Hujan → Banjir :: Kekeringan → ?
+  - Hubungan bagian-fungsi: Teleskop : Bintang :: Stetoskop : ?
+  - Hubungan subjek-objek: Petani : Sawah :: Nelayan : ?
+  - Hubungan hierarki/genus-spesies: Mamalia : Paus :: Reptilia : ?
+  - Hubungan antonim/sinonim kontekstual
+  - WAJIB: Nyatakan hubungan eksplisit di pembahasanSingkat sebelum menentukan jawaban
+
+▸ Silogisme / Penalaran Logis
+  - Silogisme kategoris: Premis 1 (semua A adalah B) + Premis 2 (C adalah A) → Kesimpulan (C adalah B)
+  - Silogisme dengan negasi: "Tidak ada", "Beberapa", "Semua bukan"
+  - Kontraposisi: Jika P maka Q → Jika tidak Q maka tidak P
+  - Penalaran kondisional bersarang: If-then-else dengan 2-3 kondisi
+  - Contoh pola soal: "Semua dokter adalah sarjana. Sebagian sarjana adalah pengusaha. Kesimpulan yang PASTI benar adalah..."
+  - WAJIB: Tuliskan struktur premis secara formal di pembahasanSingkat
+
+ATURAN KETAT PEMBUATAN SOAL:
+1. HITUNG ULANG setiap jawaban numerik dari nol — cantumkan langkah di pembahasanSingkat
+2. Pengecoh numerik WAJIB berupa hasil kesalahan umum (misal: lupa balik nilai, salah operasi urutan)
+3. Semua soal bisa diselesaikan TANPA kalkulator dalam ≤ 2 menit
+4. Variasikan tipe: setiap batch harus ada minimal 3 tipe berbeda (numerik, verbal, figural)
+5. ANTI-REPETISI: tidak ada dua soal dengan konsep/konteks yang sama dalam satu batch
+6. Angka dalam soal cerita harus realistis dan bersih (hasil bilangan bulat atau pecahan sederhana)
 
 Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 [{"id":1,"subtest":"TIU","subtestFull":"Tes Intelejensia Umum","tipe":"pilihan_ganda",
@@ -297,7 +345,7 @@ async function generate(groq, subtest, count, batchIndex) {
       console.log(`OK: ${model} → ${questions.length} soal`);
       return { questions, model };
     } catch(err) {
-      if ([429,413,503].includes(err.status)) { lastErr=err; continue; }
+      if ([429,413,503,400,404].includes(err.status)) { lastErr=err; console.warn(`Model ${model} skip:`, err.status); continue; }
       throw err;
     }
   }
@@ -361,7 +409,7 @@ module.exports = async function handler(req, res) {
     });
   } catch(err) {
     console.error('Generate error:', err.message);
-    if (err.status===401) return res.status(401).json({success:false,error:'GROQ_API_KEY tidak valid.'});
+    if (err.status===401) return res.status(401).json({success:false,error:'GROQ_API_KEY tidak valid atau expired. Perbarui di Vercel Dashboard → Settings → Environment Variables, lalu Redeploy.'});
     return res.status(500).json({success:false,error:err.message});
   }
 };
