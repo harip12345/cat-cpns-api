@@ -282,54 +282,44 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
 @media(max-width:768px){
-  /* ── Halaman non-ujian: scroll normal, tidak ada fixed/sticky ── */
-  .lb-container{padding-top:16px}
-  .subtest-selector{padding-top:16px}
-  .hasil-container{padding-top:16px}
+  /* ── Non-ujian pages: normal scroll ── */
+  .lb-container{padding-top:12px}
+  .subtest-selector{padding-top:12px}
+  .hasil-container{padding-top:12px}
 
-  /* ── HALAMAN UJIAN: layout fixed 1-scroll ── */
-  /* Hanya berlaku di dalam #view-ujian */
-  #view-ujian{
-    display:flex;
+  /* ── HALAMAN UJIAN: gunakan class .ujian-active yang ditambah JS ── */
+  /* Layout ujian: flex column, mengisi viewport */
+  .view-ujian-active{
+    display:flex !important;
     flex-direction:column;
     height:100dvh;
     overflow:hidden;
-    position:fixed; /* kunci: page tidak bisa scroll */
-    top:0;left:0;right:0;bottom:0;
+    /* TIDAK pakai position:fixed — cukup height+overflow */
   }
-  /* Navbar di dalam ujian: sticky di atas */
-  #view-ujian .top-navbar{
-    position:relative;
-    flex-shrink:0;
-  }
-  .exam-topbar{
-    position:relative;
+  .view-ujian-active .exam-topbar{
     flex-shrink:0;
     flex-wrap:nowrap;gap:6px;padding:7px 12px;
+    position:sticky;top:0;z-index:90;
   }
-  /* Exam layout mengisi sisa ruang */
-  .exam-layout{
+  .view-ujian-active .exam-layout{
     display:flex;flex-direction:column;
     grid-template-columns:unset;min-height:unset;
     flex:1;overflow:hidden;
   }
-  /* Soal: satu-satunya yang scroll */
-  .question-panel{
+  .view-ujian-active .question-panel{
     order:1;flex:1 1 0;
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:12px 13px 8px;min-height:0;
     background:var(--light);
   }
-  /* Navigasi: fixed height, scroll sendiri */
-  .nav-panel{
+  .view-ujian-active .nav-panel{
     order:2;flex:0 0 195px;height:195px;
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     position:static;border-left:none;
     border-top:1.5px solid var(--border);
     padding:10px 12px 6px;
   }
-  /* Nav bottom: di bawah nav panel (bukan fixed, agar tidak overlap) */
-  .nav-bottom{
+  .view-ujian-active .nav-bottom{
     position:relative;flex-shrink:0;
     width:100%;padding:7px 10px;gap:5px;
     border-top:1.5px solid var(--border);
@@ -337,11 +327,12 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   }
   /* Soal grid */
   .soal-grid{grid-template-columns:repeat(7,1fr);gap:4px}
-  /* Tombol */
-  .btn-nav{padding:7px 8px;font-size:.74rem;min-width:0}
-  .btn-add-soal{padding:7px 8px;font-size:.71rem;min-width:0}
-  .btn-finish{font-size:.72rem;padding:6px 8px}
-  .btn-selesai-final{padding:7px 8px;font-size:.74rem}
+  /* Tombol nav — lebih besar agar mudah diklik di HP */
+  .btn-nav{padding:11px 14px;font-size:.82rem;min-width:44px;min-height:44px}
+  .btn-flag{padding:11px 12px;font-size:.82rem;min-height:44px}
+  .btn-add-soal{padding:10px 12px;font-size:.78rem;min-height:44px}
+  .btn-finish{font-size:.78rem;padding:10px 12px;min-height:44px}
+  .btn-selesai-final{padding:10px 12px;font-size:.78rem;min-height:44px}
   /* Timer compact */
   .timer-value{font-size:1rem}
   .timer-box{padding:5px 10px;gap:6px}
@@ -351,11 +342,11 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 
 @media(max-width:480px){
   .soal-grid{grid-template-columns:repeat(6,1fr)}
-  .nav-panel{flex:0 0 170px;height:170px}
-  .exam-layout{height:calc(100dvh - 58px - 48px - 50px)}
-  .question-panel{padding:10px 11px 6px}
-  .btn-nav{padding:6px 7px;font-size:.72rem}
-  .btn-add-soal{font-size:.7rem;padding:6px 7px}
+  .view-ujian-active .nav-panel{flex:0 0 170px;height:170px}
+  .view-ujian-active .question-panel{padding:10px 11px 6px}
+  .btn-nav{padding:10px 11px;font-size:.78rem;min-width:40px}
+  .btn-flag{padding:10px 10px;font-size:.78rem}
+  .btn-add-soal{font-size:.74rem;padding:10px 10px}
   .nav-bottom{padding:6px 8px;gap:4px}
 }
 </style>
@@ -1038,8 +1029,9 @@ Klik "Generate Soal Baru" untuk membuat soal pertama kali.`);
 
   hideLoading();
   showView('ujian');
+  // Tambah class mobile layout saat ujian aktif
+  document.getElementById('view-ujian').classList.add('view-ujian-active');
   document.getElementById('exam-type-label').textContent = examType.toUpperCase();
-  // Tampilkan nama peserta di navbar
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
   // Tambah class exam-mode ke body untuk offset fixed headers di mobile
@@ -1615,6 +1607,7 @@ function submitExam() {
   reviewSec.parentNode.insertBefore(lbBtn, reviewSec);
 
 
+  document.getElementById('view-ujian').classList.remove('view-ujian-active');
   showView('hasil');
 }
 
@@ -1743,6 +1736,7 @@ Soal lama di database akan ditimpa.`)) return;
 function goToMenu(){
   clearInterval(S.timerInterval);
   document.getElementById('modal-home').classList.remove('show');
+  document.getElementById('view-ujian').classList.remove('view-ujian-active');
 
   const prevNama = S.namaPeserta;
   S={examType:null,namaPeserta:prevNama,questions:[],userAnswers:{},flagged:new Set(),currentQ:0,timeLeft:0,timerInterval:null,batchDone:{},generating:false};
