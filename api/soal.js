@@ -27,7 +27,7 @@ const PROMPTS = {
   TWK: `Anda adalah Tim Konsorsium Nasional Penyusun Soal Seleksi CPNS (Gabungan Expert dari BKN, KemenPAN-RB, BPIP, Lemhannas, KPK, dan Badan Pengembangan dan Pembinaan Bahasa), spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi 2024–2025.
 
 FILOSOFI & SUMBER SOAL TWK TERKINI (WAJIB DIPAHAMI):
-Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z), jadi jangan ada hafalan seperti itu. 
+Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z), jadi jangan ada hafalan apapun. 
 Soal WAJIB menguji PENALARAN TINGKAT TINGGI (HOTS) dan PEMAHAMAN KONTEKSTUAL. Skenario soal harus mengambil inspirasi dari rilis kasus nyata, kajian, atau dokumen resmi dari lembaga negara terkait.
 
 KISI-KISI RESMI TWK & REFERENSI LEMBAGA SUMBER SOAL:
@@ -74,7 +74,7 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 "text":"Skenario/kasus yang kompleks dan membutuhkan penalaran...",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "kunciJawaban":"B",
-"pembahasanSingkat":"Analisis mengapa B benar: [penjelasan substantif]. Mengapa opsi lain salah: [analisis pengecoh].",
+"pembahasanCukupDetail":"Analisis cukup detail mengapa B benar: [penjelasan substantif]. Mengapa opsi lain salah: [analisis pengecoh].",
 "referensi":"Sumber spesifik: Pasal X UUD 1945 / Sila Y Pancasila / TAP MPR No. Z / UU No. X Tahun Y",
 "nilai":{"benar":5,"salah":0}}]`,
 
