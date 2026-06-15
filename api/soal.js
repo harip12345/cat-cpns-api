@@ -27,7 +27,7 @@ const PROMPTS = {
   TWK: `Anda adalah Tim Konsorsium Nasional Penyusun Soal Seleksi CPNS (Gabungan Expert dari BKN, KemenPAN-RB, BPIP, Lemhannas, KPK, dan Badan Pengembangan dan Pembinaan Bahasa), spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi 2024–2025.
 
 FILOSOFI & SUMBER SOAL TWK TERKINI (WAJIB DIPAHAMI):
-Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z), jadi jangan ada hafalan apapun. 
+Soal TWK era 2024-2025 TIDAK lagi menguji hafalan (siapa tokoh X, tanggal Y, bunyi pasal Z, Pasal berapa), jadi jangan ada hafalan apapun. 
 Soal WAJIB menguji PENALARAN TINGKAT TINGGI (HOTS) dan PEMAHAMAN KONTEKSTUAL. Skenario soal harus mengambil inspirasi dari rilis kasus nyata, kajian, atau dokumen resmi dari lembaga negara terkait.
 
 KISI-KISI RESMI TWK & REFERENSI LEMBAGA SUMBER SOAL:
