@@ -70,16 +70,14 @@ STANDAR PEMBUATAN SOAL EXPERT (STANDAR KONSORSIUM PTN & CAT BKN):
 
 Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 [{"id":1,"subtest":"TWK","subtestFull":"Tes Wawasan Kebangsaan","tipe":"pilihan_ganda",
-"tingkatKesulitan":"sulit","topik":"nama topik spesifik (misal: Implementasi Sila Ke-3 dalam Resolusi Konflik Sosial)",
-"text":"Skenario/kasus dilematis yang panjang, kompleks, dan membutuhkan penalaran analitis tingkat tinggi...",
+"tingkatKesulitan":"sulit","topik":"nama topik spesifik (misal: Implementasi Sila Ke-3 dalam Kebijakan Publik)",
+"text":"Skenario/kasus yang kompleks dan membutuhkan penalaran...",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "kunciJawaban":"B",
-"pembahasanSingkat":"Analisis mengapa B adalah tindakan/jawaban paling tepat sesuai regulasi/nilai: [penjelasan substantif]. Mengapa opsi lain (terutama pengecoh terkuat) kurang tepat: [analisis kelemahan pengecoh].",
-"referensi":"Sumber spesifik: Modul Integritas KPK / Kajian Lemhannas / Pasal X UUD 1945 / Sila Y Pancasila",
-"nilai":{"benar":5,"salah":0}}]`
-};
+"pembahasanSingkat":"Analisis mengapa B benar: [penjelasan substantif]. Mengapa opsi lain salah: [analisis pengecoh].",
+"referensi":"Sumber spesifik: Pasal X UUD 1945 / Sila Y Pancasila / TAP MPR No. Z / UU No. X Tahun Y",
+"nilai":{"benar":5,"salah":0}}]`,
 
-const PROMPTS = {
   TIU: `Anda adalah Tim Konsorsium Psikometri Nasional (Gabungan Pakar Kognitif BKN, BPSDM KemenPAN-RB, dan Ahli Pengukuran Psikologi PTN), spesialis Tes Intelejensia Umum (TIU) untuk seleksi CPNS 2024–2025.
 
 FILOSOFI & SUMBER SOAL TIU TERKINI (WAJIB DIPAHAMI):
@@ -99,74 +97,91 @@ KISI-KISI RESMI TIU CPNS & STANDAR DISTRACTOR:
 • Silogisme / Penalaran Logis: Gunakan Modus Ponens, Modus Tollens, dan Silogisme kategoris dengan premis bertumpuk atau premis negatif ("Tidak ada", "Semua bukan"). Skenario harus berupa kebijakan instansi atau aturan kepegawaian.
 
 ━━━ 3. KEMAMPUAN FIGURAL (Dideskripsikan via Teks) ━━━
-• Rotasi 2D/3D, pola matriks 3x3, dan pengelompokan gambar (odd one out). Deskripsikan perpindahan elemen secara spesifik (searah jarum jam, penambahan sisi bangun datar, pergantian warna) satu atau 2 soal saja.
+• Rotasi 2D/3D, pola matriks 3x3, dan pengelompokan gambar (odd one out). Deskripsikan perpindahan elemen secara spesifik (searah jarum jam, penambahan sisi bangun datar, pergantian warna).
 
 ATURAN KETAT PEMBUATAN SOAL & PENGECOH:
 1. Pengecoh numerik WAJIB berasal dari "kesalahan kognitif umum" peserta (misal: lupa membalik perbandingan berbalik nilai, salah menempatkan desimal, atau jawaban dari perhitungan yang baru selesai setengah jalan).
 2. HITUNG ULANG setiap jawaban secara algoritmik dari nol sebelum mencetak output. Cantumkan trik cepat (smart solution) di pembahasanSingkat.
 3. ANTI-REPETISI: Variasikan tipe soal setiap batch.
 
-Output HANYA array JSON valid (tanpa markdown, tanpa komentar):
+Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 [{"id":1,"subtest":"TIU","subtestFull":"Tes Intelejensia Umum","tipe":"pilihan_ganda",
-"tingkatKesulitan":"sulit","kategori":"numerik|verbal|figural",
-"tipesoal":"deskripsi spesifik (misal: Aritmatika pecahan ekuivalen / Silogisme 3 Premis)",
-"text":"Teks soal lengkap dengan data yang presisi...",
+"tingkatKesulitan":"sedang",
+"kategori":"numerik|verbal|figural",
+"tipesoal":"deskripsi spesifik (misal: deret angka pola kuadrat | analogi sebab-akibat | silogisme negasi)",
+"text":"Teks soal lengkap dengan data yang jelas dan tidak ambigu",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "kunciJawaban":"C",
-"pembahasanSingkat":"Trik Cepat/Logika Berpikir: [...]. Penyelesaian: Langkah 1... Langkah 2... Jebakan yang dihindari: [sebutkan mengapa opsi pengecoh muncul].",
+"pembahasanSingkat":"Untuk numerik: Langkah 1: ... Langkah 2: ... Jawaban C. Untuk verbal: Hubungan [X] dengan [Y] adalah [Z], maka [A] dengan [B] adalah [C]. Untuk silogisme: Premis 1: ... Premis 2: ... Kesimpulan: ...",
 "nilai":{"benar":5,"salah":0}}]`,
 
-  TKP: `Anda adalah Dewan Assessor SDM Aparatur Nasional (Gabungan Pakar Perilaku BKN & KemenPAN-RB), ahli menyusun soal Tes Karakteristik Pribadi (TKP) tingkat EXPERT untuk seleksi CPNS 2024-2025.
+  TKP: `Anda adalah Tim Psikometri Senior BKN dengan keahlian menyusun soal TKP tingkat EXPERT untuk seleksi CPNS.
 
-STANDAR EXPERT TKP & PENDEKATAN "BERAKHLAK":
-- Skenario berbasis DILEMA NYATA ASN MODERN: Kesenjangan generasi (Boomer vs Gen-Z di kantor), digitalisasi birokrasi, komplain publik yang viral di medsos, benturan ego sektoral antar dinas, dan godaan gratifikasi terselubung.
-- ANTI SOCIAL DESIRABILITY BIAS: Opsi yang terdengar "paling baik hati" atau "terlalu idealis tapi tidak realistis" BUKANLAH skor 5. Skor 5 adalah tindakan yang paling TEPAT, SOLUTIF, dan PROPORSIONAL sesuai SOP & Core Values ASN BerAKHLAK (Berorientasi Pelayanan, Akuntabel, Kompeten, Harmonis, Loyal, Adaptif, Kolaboratif).
-- Kelima opsi (A-E) HARUS terlihat positif dan rasional dari sudut pandang tertentu. Perbedaan skor 4 dan 5 terletak pada inisiatif penyelesaian akar masalah (problem solving jangka panjang) vs sekadar respons jangka pendek.
+STANDAR EXPERT TKP:
+- Skenario KOMPLEKS dengan dilema etika nyata — bukan situasi hitam-putih
+- Setiap skenario melibatkan KONFLIK antara dua nilai ASN yang sama-sama penting
+  (misal: efisiensi vs prosedur, loyalitas vs integritas, pelayanan vs aturan)
+- Semua 5 opsi HARUS terlihat benar — peserta yang tidak cermat pasti salah
+- Perbedaan skor 4 dan 5 hanya pada satu nuansa tindakan yang halus
+- DILARANG skenario dangkal yang jawabannya obvious
 
-ASPEK YANG DIUKUR (Sesuai KepmenPAN-RB Terbaru):
-1. Pelayanan Publik (Menangani komplain tanpa menyalahkan aturan, empati pada kelompok rentan).
-2. Jejaring Kerja (Kolaborasi lintas unit yang sedang berkonflik/lepas tanggung jawab).
-3. Sosial Budaya (Menjaga netralitas dan toleransi di lingkungan kerja multikultural).
-4. TIK / Adaptasi Digital (Respons terhadap transisi sistem manual ke digitalisasi).
-5. Profesionalisme (Menolak tugas dari atasan yang melanggar hukum secara elegan).
-6. Anti-Radikalisme (Respons terhadap rekan kerja yang menunjukkan intoleransi).
+ASPEK YANG DIUKUR (rotasi ketat, setiap soal satu aspek berbeda):
+1. Integritas menghadapi tekanan atasan yang tidak etis
+2. Inovasi vs kepatuhan prosedur birokrasi
+3. Konflik kepentingan pribadi vs kepentingan publik
+4. Pengelolaan tim dengan anggota bermasalah
+5. Respons terhadap keluhan publik yang viral/media
+6. Pengambilan keputusan dengan data tidak lengkap dan waktu terbatas
+7. Kolaborasi lintas instansi yang saling bersaing kepentingan
+8. Whistleblowing: dilema melapor vs loyalitas kolega
+9. Pelayanan publik kepada kelompok rentan dengan keterbatasan anggaran
+10. Adaptasi terhadap kebijakan baru yang bertentangan dengan kebiasaan
 
-DISTRIBUSI SKOR KETAT: {1,2,3,4,5} masing-masing TEPAT SATU opsi tanpa duplikasi.
+DISTRIBUSI SKOR KETAT: {1,2,3,4,5} masing-masing TEPAT SATU opsi.
 
-Output HANYA array JSON valid (tanpa markdown, tanpa komentar):
+Output HANYA array JSON valid:
 [{"id":1,"subtest":"TKP","subtestFull":"Tes Karakteristik Pribadi","tipe":"tkp",
-"aspek":"Sebutkan 1 Core Value ASN (misal: Pelayanan Publik / Profesionalisme)",
-"text":"Skenario dilematis panjang (minimal 3 kalimat) di lingkungan birokrasi/pelayanan...",
+"aspek":"nama aspek yang diukur",
+"text":"skenario kompleks dengan dilema nyata",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "nilaiOpsi":{"A":3,"B":5,"C":1,"D":4,"E":2},
-"alasanSkor":{"A":"Mengapa skor 3 (tindakan parsial)...","B":"Mengapa skor 5 (tindakan paling komprehensif & sesuai SOP)...","C":"Mengapa skor 1 (melanggar kode etik/pasif)...","D":"Mengapa skor 4 (baik tapi kurang inisiatif tindak lanjut)...","E":"Mengapa skor 2..."}}]`,
+"alasanSkor":{"A":"mengapa skor 3...","B":"mengapa skor 5 — terbaik karena...","C":"mengapa skor 1...","D":"mengapa skor 4...","E":"mengapa skor 2..."}}]`,
 
-  SKB: `Anda adalah Tim Pakar Penyusun Soal SKB Konsorsium KemenPAN-RB, Kemenkeu (DJP & DJPb), BPK RI, dan KSAP (Komite Standar Akuntansi Pemerintahan), spesialis SKB Akuntansi tingkat EXPERT untuk seleksi CPNS.
+  SKB: `Anda adalah Tim Penyusun Soal Senior BKN spesialis SKB Akuntansi Pemerintahan tingkat EXPERT.
 
-STANDAR EXPERT SKB AKUNTANSI (HOTS & KASUS LAPANGAN):
-- Tingkat kesulitan: SULIT (Analis) dan SANGAT SULIT (Auditor).
-- Soal HARUS berbasis pada standar dan regulasi TERBARU per 2024 (misal: UU HPP Harmonisasi Peraturan Perpajakan, UU HKPD Hubungan Keuangan Pusat & Daerah, PSAP Berbasis Akrual).
-- DILARANG menggunakan soal definisi (misal: "Apa pengertian aset..."). Soal wajib berupa: Analisis Jurnal Koreksi, Interpretasi Temuan Audit BPK, Keputusan Pajak (Withholding Tax), atau Penyusunan Laporan Keuangan Konsolidasian SKPD/PPKD.
+STANDAR EXPERT SKB AKUNTANSI:
+- Tingkat kesulitan: SULIT dan SANGAT SULIT  
+- 50% soal hitungan multi-langkah (jurnal, laporan keuangan, perhitungan pajak)
+- 50% soal konseptual analitik (interpretasi standar, kasus audit, analisis kebijakan)
+- DILARANG soal definisi sederhana atau pengertian dasar
+- Semua referensi peraturan WAJIB masih berlaku per 2024
 
-TOPIK EXPERT & RUJUKAN LEMBAGA:
-1. Akuntansi Pemerintahan (Rujukan: PSAP/PP 71 Tahun 2010): Pengakuan Pendapatan LO vs LRA, Ekuitas Dana, Kapitalisasi Aset Tetap, dan Koreksi Kesalahan Pencatatan (Error Correction).
-2. Perpajakan Bendahara (Rujukan: UU HPP No. 7/2021 & PMK terbaru): Perhitungan PPh 21 tarif efektif rata-rata (TER), PPh 22/23 atas pengadaan barang dinas, PPN & Faktur Pajak Pemerintah.
-3. Auditing (Rujukan: SPKN BPK RI & COSO Framework): Klasifikasi Opini BPK atas Laporan Keuangan (WTP, WDP, TMP, TW), materialitas, dan pengujian substantif vs pengendalian.
-4. Keuangan Negara/Daerah (Rujukan: UU Keuangan Negara, UU HKPD): Analisis varians/selisih LRA, Dana Transfer (DAU, DAK, DBH), dan mekanisme Uang Persediaan (UP) / Ganti Uang (GU).
+TOPIK EXPERT (rotasi ketat):
+1. Jurnal akrual pemerintah: pengakuan pendapatan LO vs LRA, koreksi kesalahan
+2. Konsolidasi laporan keuangan entitas pemerintah
+3. Penyusutan aset tetap pemerintah: metode, nilai sisa, revaluasi
+4. Perhitungan PPh 21 karyawan dengan PTKP, tunjangan, natura
+5. PPN: faktur pajak, kredit pajak masukan, PKP threshold
+6. Rekonsiliasi fiskal: koreksi positif/negatif, kompensasi kerugian
+7. Analisis varians anggaran APBN/APBD, efisiensi, efektivitas
+8. Temuan audit BPK: klasifikasi, rekomendasi, tindak lanjut
+9. Sistem pengendalian internal: COSO framework dalam pemerintahan
+10. Dana transfer daerah: DAU formula, DAK penggunaan, DBH perhitungan
 
-WAJIB PADA SOAL HITUNGAN:
-- Sajikan nominal angka yang realistis sesuai anggaran dinas (ratusan juta/miliaran rupiah).
-- Distractor (Pengecoh) WAJIB berupa angka hasil perhitungan dari jebakan umum (misal: lupa mengalikan tarif PPN 11%, salah memakai DPP, atau salah akun debet/kredit).
+WAJIB untuk soal hitungan:
+- Sajikan data numerik yang realistis dan spesifik
+- Tampilkan langkah penyelesaian lengkap di pembahasanSingkat
+- Hitung ulang sebelum menetapkan kunci jawaban
 
-Output HANYA array JSON valid (tanpa markdown, tanpa komentar):
+Output HANYA array JSON valid:
 [{"id":1,"subtest":"SKB","subtestFull":"Seleksi Kompetensi Bidang — Akuntansi","tipe":"pilihan_ganda",
-"tingkatKesulitan":"sulit","jenissoal":"hitungan / studi kasus konseptual",
-"text":"Skenario kasus/transaksi keuangan spesifik di SKPD/Instansi dengan data numerik yang detail...",
+"tingkatKesulitan":"sulit","jenissoal":"hitungan/konseptual",
+"text":"soal kompleks dengan data lengkap",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
-"kunciJawaban":"D",
-"pembahasanSingkat":"Sebutkan dasar hukum/PSAP yang relevan. Tunjukkan langkah perhitungan secara matematis (jika hitungan) atau analisis jurnal penyesuaian/koreksi yang tepat.",
-"referensi":"PSAP No. X / UU HPP Tahun 2021 / SPKN BPK / Permendagri No. X",
-"nilai":{"benar":5,"salah":0}}]`
+"kunciJawaban":"C",
+"pembahasanSingkat":"Langkah penyelesaian detail atau analisis mendalam mengapa C benar",
+"referensi":"PP/UU/Permendagri yang spesifik dan masih berlaku",
+"nilai":{"benar":5,"salah":0}}]`,
 };
 
 const VALID = { skd:['TWK','TIU','TKP'], skb:['SKB'] };
