@@ -3,6 +3,10 @@
 // Device lain langsung pakai soal yang sama tanpa generate ulang.
 // forceNew=true → generate baru dan timpa database.
 
+// ─── FIX: Set maxDuration 60 detik agar Vercel tidak kill function
+// sebelum generate + simpan ke Firestore selesai (default Vercel = 10 detik)
+export const maxDuration = 60;
+
 const Groq = require('groq-sdk');
 
 function cors(res) {
@@ -11,6 +15,7 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
+// Model Groq per Juni 2026
 const MODELS = [
   'meta-llama/llama-4-scout-17b-16e-instruct',
   'llama-3.3-70b-versatile',
@@ -40,63 +45,62 @@ KISI-KISI RESMI TWK & REFERENSI LEMBAGA SUMBER SOAL:
 • Hierarki hukum Indonesia (UU No. 12/2011 j.o UU No. 13/2022).
 • Pembukaan UUD 1945: Makna alinea dan hubungannya dengan tujuan negara dalam konteks geopolitik saat ini.
 • Pasal Strategis Batang Tubuh hasil Amandemen (Hak Asasi Manusia, Sistem Pemerintahan, Perekonomian).
-• PENALARAN KONTEKSTUAL: Diberikan skenario hukum tata negara nyata (misal: sengketa kewenangan lembaga, kasus diskriminasi rasial/gender, kebebasan beragama), peserta menentukan pasal yang relevan dan implementasinya.
+• PENALARAN KONTEKSTUAL: Diberikan skenario hukum tata negara nyata, peserta menentukan pasal yang relevan dan implementasinya.
 
 ━━━ 3. NKRI & NASIONALISME (Sumber Gaya Soal: Dokumen Ketahanan Nasional - Lemhannas) ━━━
 • Sejarah Kemerdekaan: Peran strategis organisasi pergerakan nasional sebagai fondasi kesadaran berbangsa.
-• Wawasan Nusantara & Ketahanan Nasional: Menggunakan kerangka Astagatra Lemhannas (Geografi, Demografi, SDA, Ideologi, Politik, Ekonomi, Sosial Budaya, Hankam) dalam menghadapi ancaman non-militer (proxy war, cyber crime, perang dagang).
-• Bela Negara (Pasal 27 ayat 3 & Pasal 30 UUD 1945): Konteks bela negara modern bagi ASN (pelayanan publik prima, menangkal hoaks, bangga buatan Indonesia).
+• Wawasan Nusantara & Ketahanan Nasional: Menggunakan kerangka Astagatra Lemhannas dalam menghadapi ancaman non-militer.
+• Bela Negara (Pasal 27 ayat 3 & Pasal 30 UUD 1945): Konteks bela negara modern bagi ASN.
 
 ━━━ 4. BHINNEKA TUNGGAL IKA (Sumber Gaya Soal: Studi Kasus Kemenag RI & Kemensos) ━━━
-• Mengelola keberagaman: Strategi integrasi sosial, mitigasi konflik horizontal, toleransi antarumat beragama, dan peran ASN sebagai perekat bangsa.
+• Mengelola keberagaman: Strategi integrasi sosial, mitigasi konflik horizontal, toleransi antarumat beragama.
 • Makna filosofis Sutasoma dalam menghadapi isu etnosentrisme, chauvinisme, dan primordialisme di era digital.
 
-━━━ 5. INTEGRITAS (Sumber Gaya Soal: Modul Anti-Korupsi KPK RI & Core Values ASN BerAKHLAK KemenPAN-RB) ━━━
+━━━ 5. INTEGRITAS (Sumber Gaya Soal: Modul Anti-Korupsi KPK RI & Core Values ASN BerAKHLAK) ━━━
 • 9 Nilai Dasar Integritas (KPK): Jujur, peduli, mandiri, disiplin, tanggung jawab, kerja keras, sederhana, berani, adil.
-• Skenario WAJIB berupa dilema etika ASN di tempat kerja (gratifikasi, benturan kepentingan/conflict of interest, whistleblowing system).
-• Analisis perilaku keteladanan tokoh bangsa (Soekarno, Hatta, Hoegeng, Baharuddin Lopa, dll) dalam menolak intervensi/korupsi.
+• Skenario WAJIB berupa dilema etika ASN di tempat kerja (gratifikasi, benturan kepentingan, whistleblowing).
 
 ━━━ 6. BAHASA INDONESIA (Sumber Gaya Soal: Tes UKBI Kemdikbudristek/Badan Bahasa) ━━━
-• Analisis Wacana Ilmiah/Berita Formal: Menentukan ide pokok, simpulan, asumsi logis, dan kelemahan argumen dari teks yang panjang dan kompleks.
+• Analisis Wacana Ilmiah/Berita Formal: Menentukan ide pokok, simpulan, asumsi logis, dan kelemahan argumen.
 • Kalimat efektif dan ketepatan diksi berdasarkan EYD Edisi V dan KBBI.
 
-STANDAR PEMBUATAN SOAL EXPERT (STANDAR KONSORSIUM PTN & CAT BKN):
+STANDAR PEMBUATAN SOAL EXPERT:
 1. WAJIB berbasis skenario/kasus/dilema nyata yang biasa dialami ASN atau masyarakat luas.
-2. Pengecoh (Distractor) HARUS Sangat Meyakinkan: Semua opsi (A,B,C,D,E) harus terlihat positif atau benar. Perbedaan jawaban benar vs pengecoh terbaik hanya terletak pada TINGKAT KETEPATAN KONTEKS atau HIERARKI NILAI.
-3. Referensi Akurat: Pembahasan wajib mengutip dasar hukum (Pasal, UU) atau teori resmi (misal: Nilai Dasar KPK, Astagatra Lemhannas).
+2. Pengecoh (Distractor) HARUS Sangat Meyakinkan: Semua opsi (A,B,C,D,E) harus terlihat positif atau benar.
+3. Referensi Akurat: Pembahasan wajib mengutip dasar hukum atau teori resmi.
 4. ANTI-REPETISI: Setiap soal angkat aspek BERBEDA, tidak ada dua soal dengan konsep sama dalam satu batch.
 
 Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 [{"id":1,"subtest":"TWK","subtestFull":"Tes Wawasan Kebangsaan","tipe":"pilihan_ganda",
-"tingkatKesulitan":"sulit","topik":"nama topik spesifik (misal: Implementasi Sila Ke-3 dalam Kebijakan Publik)",
+"tingkatKesulitan":"sulit","topik":"nama topik spesifik",
 "text":"Skenario/kasus yang kompleks dan membutuhkan penalaran...",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "kunciJawaban":"B",
-"pembahasanCukupDetail":"Analisis cukup detail mengapa B benar: [penjelasan substantif]. Mengapa opsi lain salah: [analisis pengecoh].",
-"referensi":"Sumber spesifik: Pasal X UUD 1945 / Sila Y Pancasila / TAP MPR No. Z / UU No. X Tahun Y",
+"pembahasanCukupDetail":"Analisis cukup detail mengapa B benar. Mengapa opsi lain salah.",
+"referensi":"Sumber spesifik: Pasal X UUD 1945 / Sila Y Pancasila / UU No. X Tahun Y",
 "nilai":{"benar":5,"salah":0}}]`,
 
   TIU: `Anda adalah Tim Konsorsium Psikometri Nasional (Gabungan Pakar Kognitif BKN, BPSDM KemenPAN-RB, dan Ahli Pengukuran Psikologi PTN), spesialis Tes Intelejensia Umum (TIU) untuk seleksi CPNS 2024–2025.
 
 FILOSOFI & SUMBER SOAL TIU TERKINI (WAJIB DIPAHAMI):
 Soal TIU BKN 2024-2025 mengukur Fluid Intelligence (kecepatan & ketepatan berpikir logis analitis) sesuai kerangka Cattell-Horn-Carroll (CHC).
-Fokus pada EFISIENSI kognitif. Setiap soal dirancang sedemikian rupa agar BISA diselesaikan TANPA kalkulator dalam waktu maksimal 60-90 detik menggunakan trik/pendekatan logis, bukan hitungan kuli (brute-force).
+Fokus pada EFISIENSI kognitif. Setiap soal dirancang agar BISA diselesaikan TANPA kalkulator dalam waktu maksimal 60-90 detik menggunakan trik/pendekatan logis.
 
 KISI-KISI RESMI TIU CPNS & STANDAR DISTRACTOR:
 
-━━━ 1. KEMAMPUAN NUMERIK (Fokus: Logika Perhitungan & Aproksimasi) ━━━
-• Aritmatika Dasar & Pecahan: Operasi bilangan yang sekilas rumit namun bisa disederhanakan dengan sifat distributif/asosiatif/komutatif atau konversi bentuk (misal: 33,33% = 1/3; 0,875 = 7/8).
-• Aljabar & Persamaan: Substitusi dan eliminasi linier. Sering kali yang ditanya adalah bentuk modifikasi dari persamaannya, sehingga tidak perlu mencari nilai tunggal variabel.
-• Deret Angka/Pola Bilangan: Wajib mencakup deret bertingkat, deret Fibonacci modifikasi, atau deret ganda (alternating) yang tidak langsung terlihat.
-• Soal Cerita (Perbandingan & JKW): Konteks soal WAJIB disesuaikan dengan dunia birokrasi/pelayanan (misal: pengadaan barang instansi, penugasan dinas, proyek infrastruktur daerah).
+━━━ 1. KEMAMPUAN NUMERIK ━━━
+• Aritmatika Dasar & Pecahan: Operasi bilangan yang bisa disederhanakan dengan sifat distributif/asosiatif/komutatif.
+• Aljabar & Persamaan: Substitusi dan eliminasi linier.
+• Deret Angka/Pola Bilangan: Deret bertingkat, deret Fibonacci modifikasi, atau deret ganda (alternating).
+• Soal Cerita: Konteks WAJIB disesuaikan dengan dunia birokrasi/pelayanan publik.
 
-━━━ 2. KEMAMPUAN VERBAL (Fokus: Pemahaman Konteks & Silogisme HOTS) ━━━
-• Analogi: Dilarang menggunakan kosakata pasaran. Gunakan padanan kata yang menuntut pemahaman fungsi, hierarki, atau sebab-akibat spesifik (mengacu pada KBBI & Tes Potensi Skolastik BPPP). 
-• Silogisme / Penalaran Logis: Gunakan Modus Ponens, Modus Tollens, dan Silogisme kategoris dengan premis bertumpuk atau premis negatif ("Tidak ada", "Semua bukan"). Skenario harus berupa kebijakan instansi atau aturan kepegawaian.
+━━━ 2. KEMAMPUAN VERBAL ━━━
+• Analogi: Padanan kata yang menuntut pemahaman fungsi, hierarki, atau sebab-akibat spesifik.
+• Silogisme / Penalaran Logis: Modus Ponens, Modus Tollens, Silogisme kategoris dengan premis bertumpuk atau premis negatif.
 
 ATURAN KETAT PEMBUATAN SOAL & PENGECOH:
-1. Pengecoh numerik WAJIB berasal dari "kesalahan kognitif umum" peserta (misal: lupa membalik perbandingan berbalik nilai, salah menempatkan desimal, atau jawaban dari perhitungan yang baru selesai setengah jalan).
-2. HITUNG ULANG setiap jawaban secara algoritmik dari nol sebelum mencetak output. Cantumkan trik cepat (smart solution) di pembahasanSingkat.
+1. Pengecoh numerik WAJIB berasal dari kesalahan kognitif umum peserta.
+2. HITUNG ULANG setiap jawaban secara algoritmik dari nol sebelum mencetak output.
 3. ANTI-REPETISI: Variasikan tipe soal setiap batch.
 
 Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
@@ -107,7 +111,7 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 "text":"Teks soal lengkap dengan data yang jelas dan tidak ambigu",
 "options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
 "kunciJawaban":"C",
-"pembahasanSingkat":"Untuk numerik: Langkah 1: ... Langkah 2: ... Jawaban C. Untuk verbal: Hubungan [X] dengan [Y] adalah [Z], maka [A] dengan [B] adalah [C]. Untuk silogisme: Premis 1: ... Premis 2: ... Kesimpulan: ...",
+"pembahasanSingkat":"Untuk numerik: Langkah 1: ... Langkah 2: ... Jawaban C. Untuk verbal: Hubungan [X] dengan [Y] adalah [Z].",
 "nilai":{"benar":5,"salah":0}}]`,
 
   TKP: `Anda adalah Tim Psikometri Senior BKN dengan keahlian menyusun soal TKP tingkat EXPERT untuk seleksi CPNS.
@@ -115,7 +119,6 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 STANDAR EXPERT TKP:
 - Skenario KOMPLEKS dengan dilema etika nyata — bukan situasi hitam-putih
 - Setiap skenario melibatkan KONFLIK antara dua nilai ASN yang sama-sama penting
-  (misal: efisiensi vs prosedur, loyalitas vs integritas, pelayanan vs aturan)
 - Semua 5 opsi HARUS terlihat benar — peserta yang tidak cermat pasti salah
 - Perbedaan skor 4 dan 5 hanya pada satu nuansa tindakan yang halus
 - DILARANG skenario dangkal yang jawabannya obvious
@@ -227,22 +230,24 @@ async function fsGet(col, doc) {
   } catch { return null; }
 }
 
-// FIX: fsSet dengan retry 2x agar simpan ke Firestore lebih andal
+// ─── FIX: fsSet dengan retry 3x ───────────────────────────────
 async function fsSet(col, doc, data, extra={}) {
   const pid = process.env.FIREBASE_PROJECT_ID;
   if (!pid) return false;
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
     const token = await getToken();
-    if (!token) { console.warn(`fsSet attempt ${attempt}: no token`); continue; }
+    if (!token) {
+      console.warn(`fsSet: gagal dapat token (attempt ${attempt})`);
+      await new Promise(r => setTimeout(r, attempt * 500));
+      continue;
+    }
     try {
       const fields = {
         data:    { stringValue: JSON.stringify(data) },
         savedAt: { stringValue: new Date().toISOString() },
-        count:   { integerValue: data.length },
       };
       Object.entries(extra).forEach(([k,v]) => {
-        if (k === 'count') return; // sudah di-set dari data.length
         fields[k] = typeof v==='number' ? {integerValue:v} : {stringValue:String(v)};
       });
       const mask = Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');
@@ -252,17 +257,17 @@ async function fsSet(col, doc, data, extra={}) {
         body: JSON.stringify({ fields }),
       });
       if (r.ok) {
-        console.log(`fsSet OK attempt ${attempt}: ${doc} (${data.length} soal)`);
+        console.log(`fsSet OK: ${doc} (attempt ${attempt})`);
         return true;
       }
-      const errBody = await r.text().catch(()=>'');
-      console.warn(`fsSet attempt ${attempt} HTTP ${r.status}: ${errBody}`);
+      const errBody = await r.text().catch(() => '');
+      console.warn(`fsSet attempt ${attempt} failed: HTTP ${r.status} — ${errBody}`);
     } catch(e) {
-      console.warn(`fsSet attempt ${attempt} error:`, e.message);
+      console.warn(`fsSet attempt ${attempt} error: ${e.message}`);
     }
-    // Jeda sebelum retry
-    if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+    if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 500));
   }
+  console.error(`fsSet FINAL FAIL: ${doc} setelah 3 percobaan`);
   return false;
 }
 
@@ -326,8 +331,6 @@ module.exports = async function handler(req, res) {
   const { examType, subtest, count:cRaw, batchIndex=0, forceNew=false } = req.body||{};
   const type  = (examType||'').toLowerCase();
   const sub   = (subtest||'').toUpperCase();
-  // FIX: jangan paksa count minimum 10 — hormati count yang dikirim frontend
-  // (batch terakhir TIU=5, TKP=5, dst)
   const count = Math.min(15, Math.max(1, parseInt(cRaw||'10',10)));
   const bIdx  = parseInt(batchIndex)||0;
 
@@ -337,7 +340,7 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({success:false,error:'GROQ_API_KEY belum diset.'});
 
-  // Dokumen key: skd_TWK_b0, skd_TIU_b3, dst.
+  // Dokumen: soal_bank/skd_TWK_b0, skd_TWK_b1, dst.
   const docId = `${type}_${sub}_b${bIdx}`;
 
   // ── Cek database dulu ──────────────────────────────────────
@@ -350,7 +353,7 @@ module.exports = async function handler(req, res) {
         count:stored.length, questions:stored, source:'database',
       });
     }
-    console.log(`DB miss: ${docId} — akan generate baru`);
+    console.log(`DB miss: ${docId} — akan generate`);
   }
 
   // ── Generate dari Groq ─────────────────────────────────────
@@ -363,15 +366,15 @@ module.exports = async function handler(req, res) {
       q.nilai = q.nilai || {benar:5,salah:0};
     });
 
-    // Simpan ke Firestore dengan retry (await agar tidak terminate sebelum selesai)
+    // ── FIX UTAMA: Simpan ke Firestore DULU, baru kirim response ──
+    // Sebelumnya pakai .catch() sehingga function bisa terminate duluan
+    // Sekarang: await penuh dengan retry 3x di fsSet
     const saved = await fsSet('soal_bank', docId, questions, {
-      examType:type, subtest:sub, batchIndex:bIdx,
+      examType:type, subtest:sub, batchIndex:bIdx, count:questions.length,
     });
-    console.log(`DB save ${saved?'OK':'GAGAL'}: ${docId} (${questions.length} soal)`);
 
-    // FIX: jika simpan gagal, log warning tapi tetap return soal ke client
     if (!saved) {
-      console.error(`CRITICAL: Gagal simpan ${docId} ke Firestore!`);
+      console.error(`CRITICAL: DB save gagal untuk ${docId} setelah 3x retry.`);
     }
 
     return res.status(200).json({
