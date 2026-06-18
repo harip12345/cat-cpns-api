@@ -107,6 +107,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .question-number-badge{background:var(--blue);color:#fff;border-radius:8px;padding:5px 13px;font-size:.83rem;font-weight:700}
 .question-subtest-badge{background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 11px;font-size:.76rem;font-weight:600}
 .question-flag-badge{background:#fff8e1;color:var(--yellow);border:1.5px solid var(--yellow);border-radius:8px;padding:4px 11px;font-size:.76rem;font-weight:600;display:none}
+/* ── Tombol Chat AI (baru) ── */
 .btn-chat-ai{margin-left:auto;background:#fff;color:var(--blue2);border:1.5px solid var(--blue2);border-radius:8px;padding:4px 12px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .btn-chat-ai:hover{background:var(--blue2);color:#fff}
 .btn-chat-ai.open{background:var(--blue2);color:#fff}
@@ -283,18 +284,18 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .lb-refresh:hover{opacity:.88}
 .lb-loading{text-align:center;padding:32px;color:var(--textsub);font-size:.88rem}
 
-/* ═══ CHAT AI DRAWER ════════════════════════════════════════════ */
-.chat-drawer{position:fixed;bottom:0;right:0;width:360px;height:480px;background:#fff;border-radius:16px 0 0 0;box-shadow:-4px -4px 24px rgba(0,53,128,.18);display:flex;flex-direction:column;z-index:200;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:3px solid var(--blue2);border-left:1.5px solid var(--border)}
+/* ═══ CHAT AI DRAWER (baru) ══════════════════════════════════ */
+.chat-drawer{position:fixed;bottom:0;right:0;width:360px;height:480px;background:#fff;border-radius:16px 0 0 0;box-shadow:-4px -4px 24px rgba(0,53,128,.18);display:flex;flex-direction:column;z-index:200;transform:translateY(110%);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:3px solid var(--blue2);border-left:1.5px solid var(--border)}
 .chat-drawer.show{transform:translateY(0)}
 .chat-drawer-header{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 0 0 0;flex-shrink:0}
 .chat-drawer-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem}
 .chat-drawer-title-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:blink-dot 2s infinite}
 @keyframes blink-dot{0%,100%{opacity:1}50%{opacity:.4}}
-.chat-drawer-ctx{font-size:.68rem;opacity:.8;margin-top:1px}
-.btn-chat-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.chat-drawer-ctx{font-size:.68rem;opacity:.82;margin-top:2px}
+.btn-chat-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
 .btn-chat-close:hover{background:rgba(255,255,255,.3)}
 .chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
-.chat-bubble{max-width:86%;padding:9px 13px;border-radius:12px;font-size:.82rem;line-height:1.6;animation:fadeInUp .2s ease}
+.chat-bubble{max-width:86%;padding:9px 13px;border-radius:12px;font-size:.82rem;line-height:1.6;animation:fadeInUp .2s ease;word-break:break-word}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .chat-bubble.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:3px}
 .chat-bubble.ai{align-self:flex-start;background:var(--light);color:var(--text);border-bottom-left-radius:3px;border:1px solid var(--border)}
@@ -302,8 +303,8 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .chat-quick-btns{padding:6px 14px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--border);flex-shrink:0}
 .chat-quick-btn{background:#e8f0fe;color:var(--blue2);border:none;border-radius:10px;padding:4px 9px;font-size:.7rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
 .chat-quick-btn:hover{background:var(--blue2);color:#fff}
-.chat-input-row{padding:10px 12px;display:flex;gap:7px;border-top:1px solid var(--border);flex-shrink:0}
-.chat-input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.83rem;font-family:inherit;outline:none;resize:none;height:38px;max-height:100px;transition:border-color .2s;overflow-y:auto}
+.chat-input-row{padding:10px 12px;display:flex;gap:7px;border-top:1px solid var(--border);flex-shrink:0;align-items:flex-end}
+.chat-input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.83rem;font-family:inherit;outline:none;resize:none;height:38px;max-height:100px;transition:border-color .2s;overflow-y:auto;line-height:1.4}
 .chat-input:focus{border-color:var(--blue2)}
 .btn-chat-send{background:var(--blue2);color:#fff;border:none;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .btn-chat-send:hover{opacity:.85}
@@ -322,11 +323,13 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     height:100dvh;
     overflow:hidden;
   }
+  /* Topbar sticky di atas, selalu terlihat */
   .view-ujian-active .exam-topbar{
     flex-shrink:0;
     flex-wrap:nowrap;gap:6px;padding:7px 12px;
     position:sticky;top:0;z-index:90;
   }
+  /* exam-layout: satu kolom */
   .view-ujian-active .exam-layout{
     display:block;
     grid-template-columns:unset;min-height:unset;
@@ -334,12 +337,14 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
+  /* Question panel */
   .view-ujian-active .question-panel{
     overflow:visible;
     padding:12px 13px 0;
     min-height:unset;
     background:var(--light);
   }
+  /* Nav panel */
   .view-ujian-active .nav-panel{
     overflow:visible;
     height:auto;
@@ -348,6 +353,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     padding:8px 13px 80px;
     background:var(--light);
   }
+  /* Nav bottom */
   .view-ujian-active .nav-bottom{
     position:fixed;bottom:0;left:0;right:0;
     width:100%;padding:8px 10px;gap:5px;
@@ -364,8 +370,8 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   .timer-box{padding:5px 10px;gap:6px}
   .exam-info-section{font-size:.85rem}
   .exam-info-type{font-size:.65rem}
-  /* Chat drawer full width di mobile */
-  .chat-drawer{width:100%;height:65dvh;border-radius:16px 16px 0 0;border-left:none;border-top:3px solid var(--blue2)}
+  /* Chat drawer full-width di mobile */
+  .chat-drawer{width:100%;height:60dvh;border-radius:16px 16px 0 0;border-left:none}
   .chat-drawer-header{border-radius:14px 14px 0 0}
 }
 
@@ -441,6 +447,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 <div class="modal-overlay" id="modal-nama">
   <div class="modal-box">
     <div class="modal-header" id="modal-nama-header">👤 Identitas Peserta</div>
+    <!-- Step 1: Input nama -->
     <div id="modal-step1" class="modal-nama-body">
       <h3>Masukkan nama Anda</h3>
       <p>Nama akan ditampilkan di papan peringkat setelah ujian selesai.</p>
@@ -450,6 +457,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <button class="btn-modal-confirm" onclick="goToStep2()">Lanjut →</button>
       </div>
     </div>
+    <!-- Step 2: Pilih ujian -->
     <div id="modal-step2" class="modal-nama-body" style="display:none">
       <h3 id="modal-step2-title">Pilih Jenis Ujian</h3>
       <p id="modal-step2-desc">Pilih jenis ujian dan subtest awal:</p>
@@ -573,7 +581,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <div class="question-number-badge" id="q-number-badge">Soal 1</div>
         <div class="question-subtest-badge" id="q-subtest-badge">TWK</div>
         <div class="question-flag-badge" id="q-flag-badge">🚩 Ragu-ragu</div>
-        <!-- TOMBOL CHAT AI — di sebelah kiri tombol Kunci -->
+        <!-- TOMBOL CHAT AI — sebelah kiri tombol Kunci -->
         <button class="btn-chat-ai" id="btn-chat-ai" onclick="toggleChat()" title="Tanya Asisten AI">
           💬 Tanya AI
         </button>
@@ -594,6 +602,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <div class="progress-label"><span>Terjawab</span><span id="progress-text">0/0</span></div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
       </div>
+      <!-- Status per subtest -->
       <div class="subtest-status" id="subtest-status"></div>
       <div class="section-tabs" id="section-tabs"></div>
       <div class="soal-grid" id="soal-grid"></div>
@@ -691,10 +700,10 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
   </div>
 </div>
 
-<!-- ═══ CHAT AI DRAWER ════════════════════════════════════════ -->
+<!-- ═══ CHAT AI DRAWER (baru) ═════════════════════════════════ -->
 <div class="chat-drawer" id="chat-drawer">
   <div class="chat-drawer-header">
-    <div>
+    <div style="min-width:0">
       <div class="chat-drawer-title">
         <span>🤖 Asisten CPNS</span>
         <div class="chat-drawer-title-dot"></div>
@@ -713,7 +722,9 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     <button class="chat-quick-btn" onclick="chatQuick('Strategi passing grade SKD')">📊 Strategi PG</button>
   </div>
   <div class="chat-input-row">
-    <textarea class="chat-input" id="chat-input" placeholder="Tanya materi, minta pembahasan soal..." rows="1"
+    <textarea class="chat-input" id="chat-input"
+      placeholder="Tanya materi, minta pembahasan soal..."
+      rows="1"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
       oninput="this.style.height='38px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button class="btn-chat-send" id="btn-chat-send" onclick="sendChat()" title="Kirim">➤</button>
@@ -761,7 +772,7 @@ let S = {
 };
 
 // =============================================================
-// CHAT AI STATE
+// CHAT AI STATE & FUNGSI
 // =============================================================
 let chatHistory = [];
 let chatOpen    = false;
@@ -859,7 +870,7 @@ async function sendChat(overrideText) {
     if (data.success) {
       addChatBubble('ai', data.reply);
       chatHistory.push({ role: 'assistant', content: data.reply });
-      // Batasi history agar tidak terlalu panjang
+      // Batasi history max 20 pesan
       if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
     } else {
       addChatBubble('ai', '⚠️ Maaf, terjadi kesalahan: ' + (data.error || 'Unknown error'));
@@ -874,9 +885,7 @@ async function sendChat(overrideText) {
   document.getElementById('chat-input')?.focus();
 }
 
-function chatQuick(text) {
-  sendChat(text);
-}
+function chatQuick(text) { sendChat(text); }
 
 // ── Leaderboard state ────────────────────────────────────────
 let lbCurrentTab = 'skd';
@@ -1070,6 +1079,7 @@ async function saveToLeaderboard(examType, totalSkor, skorDetail) {
         device:     navigator.userAgent.substring(0,50),
       }),
     });
+    console.log('Leaderboard saved');
   } catch(e) { console.warn('Leaderboard save failed:', e.message); }
 }
 
@@ -1114,10 +1124,14 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   S.currentQ    = 0;
   S.batchDone   = {};
   S.generating  = false;
+
   // Reset chat saat mulai ujian baru
-  chatHistory   = [];
-  chatOpen      = false;
+  chatHistory = [];
+  chatOpen    = false;
   document.getElementById('chat-drawer').classList.remove('show');
+  const btnAI = document.getElementById('btn-chat-ai');
+  if (btnAI) btnAI.classList.remove('open');
+
   EXAM_CFG[examType].subtests.forEach(st => { S.batchDone[st.key] = 0; });
 
   const cfg          = EXAM_CFG[examType];
@@ -1131,8 +1145,11 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   for (const st of cfg.subtests) {
     const batches = Math.ceil(st.total / BATCH);
     for (let b = 0; b < batches; b++) {
+      // FIX BUG 2: kirim count yang tepat untuk batch terakhir
+      const start      = b * BATCH;
+      const countBatch = Math.min(BATCH, st.total - start);
       loadPromises.push(
-        fetchSoal(examType, st.key, BATCH, b, false)
+        fetchSoal(examType, st.key, countBatch, b, false)
           .then(qs => ({ st: st.key, b, qs }))
           .catch(() => ({ st: st.key, b, qs: null }))
       );
@@ -1143,14 +1160,17 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   const bySubtest = {};
   cfg.subtests.forEach(st => { bySubtest[st.key] = []; });
   results.forEach(({ st, b, qs }) => {
-    if (qs && qs.length) bySubtest[st][b] = qs;
+    // Simpan meskipun kosong (null tetap null, array kosong tetap kosong)
+    bySubtest[st][b] = (qs && qs.length > 0) ? qs : null;
   });
 
   cfg.subtests.forEach(st => {
     const batches = Math.ceil(st.total / BATCH);
     for (let b = 0; b < batches; b++) {
       const qs = bySubtest[st.key][b];
-      if (!qs) break;
+      // FIX BUG 1: gunakan continue bukan break —
+      // batch yang gagal/timeout tidak menghentikan batch setelahnya
+      if (!qs) continue;
       qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
       allQuestions.push(...qs);
       S.batchDone[st.key] = b + 1;
@@ -1174,16 +1194,36 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   S.questions = allQuestions;
   S.timeLeft  = cfg.timer;
 
+  // Deteksi soal yang gagal dimuat (ada di config tapi tidak ada di allQuestions)
+  const missingSummary = [];
+  cfg.subtests.forEach(st => {
+    const loaded = allQuestions.filter(q => q.subtest === st.key).length;
+    if (loaded < st.total) {
+      missingSummary.push(`${st.key}: ${loaded}/${st.total} soal termuat`);
+    }
+  });
+
   hideLoading();
+
+  // Tampilkan peringatan jika ada soal yang gagal dimuat
+  if (missingSummary.length > 0) {
+    const pesanMissing = missingSummary.join('\n');
+    alert(
+      '⚠️ Beberapa soal gagal dimuat dari database:\n' + pesanMissing +
+      '\n\nSoal yang kosong tampil sebagai placeholder abu-abu.\n' +
+      'Gunakan tombol ➕ untuk mengambil soal yang belum termuat.'
+    );
+  }
+
   showView('ujian');
   document.getElementById('view-ujian').classList.add('view-ujian-active');
   document.getElementById('exam-type-label').textContent = examType.toUpperCase();
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
 
-  // Reset chat messages ke sambutan awal
+  // Sambutan awal chat dengan nama peserta
   document.getElementById('chat-messages').innerHTML =
-    '<div class="chat-bubble ai">👋 Halo ' + S.namaPeserta + '! Saya siap bantu kamu. Klik soal lalu tekan "💡 Jelaskan soal ini" untuk mulai!</div>';
+    '<div class="chat-bubble ai">👋 Halo <strong>' + S.namaPeserta + '</strong>! Saya siap bantu kamu. Klik tombol <strong>💡 Jelaskan soal ini</strong> untuk meminta penjelasan soal yang sedang kamu kerjakan!</div>';
 
   renderNavGrid();
   renderQuestion(0);
@@ -1198,11 +1238,11 @@ function setLoadingMsg(msg) {
 }
 
 // =============================================================
-// FETCH SOAL
+// FETCH SOAL dari Vercel API
 // =============================================================
 async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
   const controller = new AbortController();
-  const timeout = forceNew ? 55000 : 8000;
+  const timeout = forceNew ? 55000 : 15000; // DB fetch: 15 detik (cukup untuk load parallel)
   const timer   = setTimeout(() => controller.abort(), timeout);
 
   try {
@@ -1264,6 +1304,7 @@ async function addNextBatch() {
     S.questions.push(...newQ);
     S.batchDone[currentSt.key] = (S.batchDone[currentSt.key]||0) + 1;
     S.generating = false;
+    console.log(`Batch added: ${currentSt.key} batch ${batchIndex} → ${newQ.length} soal, total: ${S.questions.length}`);
 
     hideLoading();
     renderNavGrid();
@@ -1423,20 +1464,20 @@ function updateNavGrid() {
 
 function renderQuestion(idx) {
   if (idx >= S.questions.length) return;
-  S.currentQ=idx;
-  const q=S.questions[idx];
+  S.currentQ = idx;
+  const q = S.questions[idx];
 
   // Update konteks chat saat pindah soal
   updateChatContext();
 
-  document.getElementById('q-number-badge').textContent  ='Soal '+(idx+1);
+  document.getElementById('q-number-badge').textContent  = 'Soal ' + (idx+1);
   document.getElementById('q-subtest-badge').textContent = q.subtest;
   document.getElementById('exam-section-label').textContent = q.subtestFull||q.subtest;
 
-  const flagBadge=document.getElementById('q-flag-badge');
-  flagBadge.style.display=S.flagged.has(idx)?'flex':'none';
-  document.getElementById('btn-flag').classList.toggle('active',S.flagged.has(idx));
-  document.getElementById('question-text').innerHTML=q.text;
+  const flagBadge = document.getElementById('q-flag-badge');
+  flagBadge.style.display = S.flagged.has(idx) ? 'flex' : 'none';
+  document.getElementById('btn-flag').classList.toggle('active', S.flagged.has(idx));
+  document.getElementById('question-text').innerHTML = q.text;
 
   // Reset kunci jawaban box saat pindah soal
   const kBox = document.getElementById('kunci-jawaban-box');
@@ -1444,14 +1485,14 @@ function renderQuestion(idx) {
   if (kBox) { kBox.style.display = 'none'; }
   if (kBtn) { kBtn.classList.remove('revealed'); kBtn.textContent = '🔑 Kunci'; }
 
-  const optEl=document.getElementById('options-list');
-  optEl.innerHTML='';
+  const optEl = document.getElementById('options-list');
+  optEl.innerHTML = '';
   Object.entries(q.options).forEach(([letter,text])=>{
-    const sel=S.userAnswers[idx]===letter;
-    const item=document.createElement('div');
-    item.className='option-item'+(sel?' selected':'');
-    item.onclick=()=>{ S.userAnswers[idx]=letter; renderQuestion(idx); };
-    item.innerHTML=`<div class="option-letter">${letter}</div><div class="option-text">${text}</div>`;
+    const sel = S.userAnswers[idx]===letter;
+    const item = document.createElement('div');
+    item.className = 'option-item' + (sel?' selected':'');
+    item.onclick = () => { S.userAnswers[idx]=letter; renderQuestion(idx); };
+    item.innerHTML = `<div class="option-letter">${letter}</div><div class="option-text">${text}</div>`;
     optEl.appendChild(item);
   });
 
@@ -1483,8 +1524,8 @@ function renderQuestion(idx) {
     document.querySelectorAll('.section-tab').forEach(t=>t.classList.toggle('active',t.textContent===q.subtest));
   }
   updateNavGrid();
-  const isMobile = window.innerWidth <= 768;
 
+  const isMobile = window.innerWidth <= 768;
   if (isMobile) {
     const examEl = document.querySelector('.exam-layout');
     if (examEl) examEl.scrollTop = 0;
@@ -1501,7 +1542,7 @@ function renderQuestion(idx) {
         }
       });
       if (slot >= 0) {
-        const btn = document.getElementById('soal-slot-' + slot);
+        const btn  = document.getElementById('soal-slot-' + slot);
         const grid = document.getElementById('soal-grid');
         if (btn && grid) {
           const btnLeft   = btn.offsetLeft;
@@ -1578,11 +1619,11 @@ function toggleKunciJawaban() {
 }
 
 function navigate(dir) {
-  const next=S.currentQ+dir;
-  if (next>=0 && next<S.questions.length) renderQuestion(next);
+  const next = S.currentQ + dir;
+  if (next >= 0 && next < S.questions.length) renderQuestion(next);
 }
 function toggleFlag() {
-  const i=S.currentQ;
+  const i = S.currentQ;
   if (S.flagged.has(i)) S.flagged.delete(i); else S.flagged.add(i);
   renderQuestion(i);
 }
@@ -1593,7 +1634,8 @@ function toggleFlag() {
 function submitExam() {
   closeModal();
   clearInterval(S.timerInterval);
-  // Tutup chat drawer saat selesai ujian
+
+  // Tutup chat drawer saat selesai
   chatOpen = false;
   document.getElementById('chat-drawer').classList.remove('show');
   const btnAI = document.getElementById('btn-chat-ai');
@@ -1683,7 +1725,7 @@ function submitExam() {
       } else {
         statusCls = 'wrong'; statusTxt = `${jaw} ✗  (Kunci: ${benar})`;
       }
-      const benarTeks = q.options?.[benar] || '';
+      const benarTeks  = q.options?.[benar] || '';
       const pembahasan = q.pembahasanSingkat || q.pembahasan || '';
       detailHTML = `<div class="review-detail">
         <div class="review-correct-ans">✅ Jawaban benar: <strong>${benar}</strong> — ${benarTeks}</div>
@@ -1835,8 +1877,9 @@ function goToMenu(){
   clearInterval(S.timerInterval);
   document.getElementById('modal-home').classList.remove('show');
   document.getElementById('view-ujian').classList.remove('view-ujian-active');
+
   // Reset chat saat kembali ke menu
-  chatOpen = false;
+  chatOpen    = false;
   chatHistory = [];
   document.getElementById('chat-drawer').classList.remove('show');
   const btnAI = document.getElementById('btn-chat-ai');
