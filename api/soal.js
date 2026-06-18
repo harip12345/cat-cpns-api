@@ -11,18 +11,16 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
-// Model Groq per Juni 2026 — urutan: terbaik kualitas → paling available
-// Referensi limit: console.groq.com/settings/limits
 const MODELS = [
-  'meta-llama/llama-4-scout-17b-16e-instruct', // Llama 4 Scout — terbaru, limit besar
-  'llama-3.3-70b-versatile',                   // 70B — kualitas terbaik, 6000 RPD
-  'qwen-qwq-32b',                              // QwQ 32B — reasoning kuat
-  'llama3-groq-70b-8192-tool-use-preview',     // 70B tool-use — alternatif
-  'gemma2-9b-it',                              // Google Gemma 9B — 14400 RPD
-  'llama-3.1-8b-instant',                      // 8B — paling cepat, 14400 RPD
+  'meta-llama/llama-4-scout-17b-16e-instruct',
+  'llama-3.3-70b-versatile',
+  'qwen-qwq-32b',
+  'llama3-groq-70b-8192-tool-use-preview',
+  'gemma2-9b-it',
+  'llama-3.1-8b-instant',
 ];
 
-// ─── SYSTEM PROMPTS — Expert Level, Anti-Repetisi ─────────────
+// ─── SYSTEM PROMPTS ────────────────────────────────────────────
 const PROMPTS = {
   TWK: `Anda adalah Tim Konsorsium Nasional Penyusun Soal Seleksi CPNS (Gabungan Expert dari BKN, KemenPAN-RB, BPIP, Lemhannas, KPK, dan Badan Pengembangan dan Pembinaan Bahasa), spesialis Tes Wawasan Kebangsaan (TWK) untuk seleksi 2024–2025.
 
@@ -229,27 +227,43 @@ async function fsGet(col, doc) {
   } catch { return null; }
 }
 
+// FIX: fsSet dengan retry 2x agar simpan ke Firestore lebih andal
 async function fsSet(col, doc, data, extra={}) {
   const pid = process.env.FIREBASE_PROJECT_ID;
   if (!pid) return false;
-  const token = await getToken();
-  if (!token) return false;
-  try {
-    const fields = {
-      data:    { stringValue: JSON.stringify(data) },
-      savedAt: { stringValue: new Date().toISOString() },
-    };
-    Object.entries(extra).forEach(([k,v]) => {
-      fields[k] = typeof v==='number' ? {integerValue:v} : {stringValue:String(v)};
-    });
-    const mask = Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');
-    const r = await fetch(`${FS_BASE(pid)}/${col}/${doc}?${mask}`, {
-      method:'PATCH',
-      headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ fields }),
-    });
-    return r.ok;
-  } catch(e) { console.warn('fsSet error:', e.message); return false; }
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const token = await getToken();
+    if (!token) { console.warn(`fsSet attempt ${attempt}: no token`); continue; }
+    try {
+      const fields = {
+        data:    { stringValue: JSON.stringify(data) },
+        savedAt: { stringValue: new Date().toISOString() },
+        count:   { integerValue: data.length },
+      };
+      Object.entries(extra).forEach(([k,v]) => {
+        if (k === 'count') return; // sudah di-set dari data.length
+        fields[k] = typeof v==='number' ? {integerValue:v} : {stringValue:String(v)};
+      });
+      const mask = Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');
+      const r = await fetch(`${FS_BASE(pid)}/${col}/${doc}?${mask}`, {
+        method:'PATCH',
+        headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
+        body: JSON.stringify({ fields }),
+      });
+      if (r.ok) {
+        console.log(`fsSet OK attempt ${attempt}: ${doc} (${data.length} soal)`);
+        return true;
+      }
+      const errBody = await r.text().catch(()=>'');
+      console.warn(`fsSet attempt ${attempt} HTTP ${r.status}: ${errBody}`);
+    } catch(e) {
+      console.warn(`fsSet attempt ${attempt} error:`, e.message);
+    }
+    // Jeda sebelum retry
+    if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+  }
+  return false;
 }
 
 // ─── Parse JSON ────────────────────────────────────────────────
@@ -269,7 +283,6 @@ async function generate(groq, subtest, count, batchIndex) {
     ? [process.env.GROQ_MODEL, ...MODELS.filter(m=>m!==process.env.GROQ_MODEL)]
     : MODELS;
 
-  // Tambahkan instruksi anti-repetisi berdasarkan batchIndex
   const antiRepeat = batchIndex > 0
     ? `\nPENTING: Ini adalah batch ke-${batchIndex+1}. Buat soal dengan topik dan konteks yang BERBEDA TOTAL dari batch sebelumnya. Jangan ulangi konsep, tokoh, pasal, atau angka yang sudah pernah digunakan.`
     : '\nPENTING: Variasikan topik setiap soal. Tidak ada dua soal dengan konsep yang sama.';
@@ -286,7 +299,7 @@ async function generate(groq, subtest, count, batchIndex) {
           { role:'system', content: PROMPTS[subtest] },
           { role:'user',   content: userPrompt },
         ],
-        temperature: 0.85, // Lebih tinggi untuk variasi lebih besar
+        temperature: 0.85,
         max_tokens:  7000,
         response_format: { type:'json_object' },
       });
@@ -313,6 +326,8 @@ module.exports = async function handler(req, res) {
   const { examType, subtest, count:cRaw, batchIndex=0, forceNew=false } = req.body||{};
   const type  = (examType||'').toLowerCase();
   const sub   = (subtest||'').toUpperCase();
+  // FIX: jangan paksa count minimum 10 — hormati count yang dikirim frontend
+  // (batch terakhir TIU=5, TKP=5, dst)
   const count = Math.min(15, Math.max(1, parseInt(cRaw||'10',10)));
   const bIdx  = parseInt(batchIndex)||0;
 
@@ -322,7 +337,7 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({success:false,error:'GROQ_API_KEY belum diset.'});
 
-  // Dokumen: soal_bank/skd_TWK_b0, skd_TWK_b1, dst.
+  // Dokumen key: skd_TWK_b0, skd_TIU_b3, dst.
   const docId = `${type}_${sub}_b${bIdx}`;
 
   // ── Cek database dulu ──────────────────────────────────────
@@ -335,6 +350,7 @@ module.exports = async function handler(req, res) {
         count:stored.length, questions:stored, source:'database',
       });
     }
+    console.log(`DB miss: ${docId} — akan generate baru`);
   }
 
   // ── Generate dari Groq ─────────────────────────────────────
@@ -347,11 +363,16 @@ module.exports = async function handler(req, res) {
       q.nilai = q.nilai || {benar:5,salah:0};
     });
 
-    // Simpan PERMANEN ke Firestore — await agar tidak terminate sebelum selesai
+    // Simpan ke Firestore dengan retry (await agar tidak terminate sebelum selesai)
     const saved = await fsSet('soal_bank', docId, questions, {
-      examType:type, subtest:sub, batchIndex:bIdx, count:questions.length,
-    }).catch(e => { console.warn('DB save error:', e.message); return false; });
-    console.log(`DB ${saved?'saved':'FAIL'}: ${docId}`);
+      examType:type, subtest:sub, batchIndex:bIdx,
+    });
+    console.log(`DB save ${saved?'OK':'GAGAL'}: ${docId} (${questions.length} soal)`);
+
+    // FIX: jika simpan gagal, log warning tapi tetap return soal ke client
+    if (!saved) {
+      console.error(`CRITICAL: Gagal simpan ${docId} ke Firestore!`);
+    }
 
     return res.status(200).json({
       success:true, examType:type, subtest:sub,
