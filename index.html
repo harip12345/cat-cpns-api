@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Simulasi CAT CPNS — BKN</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23003580'/%3E%3Crect x='20' y='6' width='24' height='10' rx='5' fill='%230051c8'/%3E%3Crect x='24' y='9' width='16' height='5' rx='2.5' fill='%23ffffff' opacity='0.9'/%3E%3Crect x='10' y='14' width='44' height='44' rx='8' fill='%230051c8'/%3E%3Cline x1='18' y1='27' x2='46' y2='27' stroke='white' stroke-width='3' stroke-linecap='round' opacity='0.45'/%3E%3Cline x1='18' y1='35' x2='40' y2='35' stroke='white' stroke-width='3' stroke-linecap='round' opacity='0.45'/%3E%3Ccircle cx='32' cy='47' r='10' fill='%23003580'/%3E%3Cpolyline points='26%2C47 30%2C51 39%2C41' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23003580'/%3E%3Crect x='20' y='6' width='24' height='10' rx='5' fill='%230051c8'/%3E%3Crect x='24' y='9' width='16' height='5' rx='2.5' fill='%23ffffff' opacity='0.9'/%3E%3Crect x='10' y='14' width='44' height='44' rx='8' fill='%230051c8'/%3E%3Cline x1='18' y1='27' x2='46' y2='27' stroke='white' stroke-width='3' stroke-linecap='round' opacity='0.45'/%3E%3Cline x1='18' y1='35' x2='40' y2='35' stroke='white' stroke-width='3' stroke-linecap='round' opacity='0.45'/%3E%3Ccircle cx='32' cy='47' r='10' fill='%23003580'/%3E%3Cpolyline points='26%2C47 30%2C51 39%2C41' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1140,42 +1142,41 @@ async function quickStart(examType, startSubtest, mode = 'db') {
 
   showLoading('Memeriksa soal di database...');
 
-  setLoadingMsg('Memeriksa soal di database...');
-  const loadPromises = [];
+  // ── Load soal dari DB: sequential per subtest, retry otomatis ──
+  // Sequential (bukan parallel) agar Vercel tidak throttle concurrent requests.
+  // Setiap batch yang gagal di-retry 1x dengan jeda 1.5 detik.
   for (const st of cfg.subtests) {
     const batches = Math.ceil(st.total / BATCH);
+    setLoadingMsg(`Memuat soal ${st.key} dari database... (0/${st.total})`);
+
     for (let b = 0; b < batches; b++) {
-      // FIX BUG 2: kirim count yang tepat untuk batch terakhir
       const start      = b * BATCH;
       const countBatch = Math.min(BATCH, st.total - start);
-      loadPromises.push(
-        fetchSoal(examType, st.key, countBatch, b, false)
-          .then(qs => ({ st: st.key, b, qs }))
-          .catch(() => ({ st: st.key, b, qs: null }))
-      );
+
+      let qs = null;
+
+      // Percobaan pertama
+      try { qs = await fetchSoal(examType, st.key, countBatch, b, false); }
+      catch(e) { qs = []; }
+
+      // Retry 1x jika gagal atau kosong — jeda agar tidak throttle
+      if (!qs || qs.length === 0) {
+        setLoadingMsg(`Retry ${st.key} batch ${b + 1}...`);
+        await new Promise(r => setTimeout(r, 1500));
+        try { qs = await fetchSoal(examType, st.key, countBatch, b, false); }
+        catch(e) { qs = []; }
+      }
+
+      if (qs && qs.length > 0) {
+        qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
+        allQuestions.push(...qs);
+        S.batchDone[st.key] = b + 1;
+        const loaded = allQuestions.filter(q => q.subtest === st.key).length;
+        setLoadingMsg(`${st.key}: ${loaded}/${st.total} soal termuat...`);
+      }
+      // Jika tetap kosong setelah retry → skip, lanjut batch berikutnya
     }
   }
-  const results = await Promise.all(loadPromises);
-
-  const bySubtest = {};
-  cfg.subtests.forEach(st => { bySubtest[st.key] = []; });
-  results.forEach(({ st, b, qs }) => {
-    // Simpan meskipun kosong (null tetap null, array kosong tetap kosong)
-    bySubtest[st][b] = (qs && qs.length > 0) ? qs : null;
-  });
-
-  cfg.subtests.forEach(st => {
-    const batches = Math.ceil(st.total / BATCH);
-    for (let b = 0; b < batches; b++) {
-      const qs = bySubtest[st.key][b];
-      // FIX BUG 1: gunakan continue bukan break —
-      // batch yang gagal/timeout tidak menghentikan batch setelahnya
-      if (!qs) continue;
-      qs.forEach(q => { q.id = globalId++; q.nilai = q.nilai||{benar:5,salah:0}; });
-      allQuestions.push(...qs);
-      S.batchDone[st.key] = b + 1;
-    }
-  });
 
   if (allQuestions.length === 0) {
     setLoadingMsg(`Database kosong, generating soal ${startSubtest} dari AI...`);
