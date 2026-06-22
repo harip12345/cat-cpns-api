@@ -478,7 +478,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     <h1 class="hero-title">Simulasi Ujian CAT CPNS</h1>
     <p class="hero-desc">Platform latihan CAT berbasis AI. Soal di-generate dari materi CPNS 2024–2025. Mulai dari soal pertama, tambah soal kapan saja selama ujian.</p>
     <div class="hero-badges">
-      <span class="hero-badge">📋 SKD & SKB Akuntansi</span>
+      <span class="hero-badge">📋 SKD & SKB (2 Prodi)</span>
       <span class="hero-badge">⏱️ Timer Real-time</span>
       <span class="hero-badge">🤖 AI Generated</span>
       <span class="hero-badge">🔄 Tambah Soal Live</span>
@@ -525,21 +525,20 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
       <div class="exam-card skb">
         <div class="exam-card-accent"></div>
         <div class="exam-card-body">
-          <div class="exam-card-icon">📊</div>
+          <div class="exam-card-icon">🏛️</div>
           <div class="exam-card-type">Seleksi Kompetensi Bidang</div>
-          <div class="exam-card-title">Simulasi SKB Akuntansi</div>
-          <div class="exam-card-desc">Materi akuntansi pemerintahan, keuangan negara, perpajakan, dan audit. Timer 90 menit, tambah soal live.</div>
+          <div class="exam-card-title">Simulasi SKB — 2 Prodi</div>
+          <div class="exam-card-desc">Pilih prodi sesuai formasi: Akuntansi atau Kesejahteraan Sosial. Timer 90 menit, 100 soal, soal AI Generated.</div>
           <div class="exam-card-meta">
             <div class="meta-chip">⏱️ 90 Menit</div>
-            <div class="meta-chip">📝 100 Soal Total</div>
+            <div class="meta-chip">📝 100 Soal</div>
+            <div class="meta-chip">🎓 2 Prodi</div>
           </div>
           <div class="exam-card-subtests">
-            <span class="subtest-tag">Akuntansi Pemerintahan</span>
-            <span class="subtest-tag">Keuangan Negara</span>
-            <span class="subtest-tag">Perpajakan</span>
-            <span class="subtest-tag">Audit & Pengawasan</span>
+            <span class="subtest-tag">📊 Akuntansi</span>
+            <span class="subtest-tag">🤝 Kesejahteraan Sosial</span>
           </div>
-          <button class="btn-start" onclick="openModalNama('skb')">▶ Mulai SKB Akuntansi</button>
+          <button class="btn-start" onclick="openModalNama('skb')">▶ Mulai SKB</button>
         </div>
       </div>
     </div>
@@ -692,7 +691,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
       <div class="lb-tabs">
         <button class="lb-tab active" id="lb-tab-skd" onclick="switchLbTab('skd')">📝 SKD</button>
-        <button class="lb-tab skb"   id="lb-tab-skb" onclick="switchLbTab('skb')">📊 SKB Akuntansi</button>
+        <button class="lb-tab skb"   id="lb-tab-skb" onclick="switchLbTab('skb')">🏛️ SKB</button>
       </div>
       <button class="lb-refresh" onclick="loadLeaderboard()">🔄 Refresh</button>
     </div>
@@ -752,10 +751,43 @@ const EXAM_CFG = {
   skb: {
     timer: 90 * 60,
     subtests: [
-      { key:'SKB', label:'Kompetensi Bidang Akuntansi', total:100 },
+      { key:'SKBAKUNTAN', label:'Kompetensi Bidang Akuntansi', total:100 },
     ],
   },
 };
+
+// Konfigurasi prodi SKB — key unik sbg docId Firestore
+const SKB_PRODI = {
+  akuntansi: {
+    label:       'SKB Akuntansi',
+    icon:        '📊',
+    subtestKey:  'SKBAKUNTAN',
+    subtestFull: 'Kompetensi Bidang Akuntansi',
+    desc:        'Akuntansi Pemerintahan, Keuangan Negara, Perpajakan, Audit & Pengawasan',
+    tags:        ['Akuntansi Pemerintahan','Keuangan Negara','Perpajakan','Audit & Pengawasan'],
+    total:       100,
+  },
+  kessos: {
+    label:       'SKB Kesejahteraan Sosial',
+    icon:        '🤝',
+    subtestKey:  'SKBKESSOS',
+    subtestFull: 'Kompetensi Bidang Kesejahteraan Sosial',
+    desc:        'Pekerjaan Sosial, Pemberdayaan Masyarakat, Perlindungan Sosial, Kebijakan Sosial',
+    tags:        ['Pekerjaan Sosial','Pemberdayaan Masyarakat','Perlindungan Sosial','Kebijakan Sosial'],
+    total:       100,
+  },
+};
+
+// Bangun EXAM_CFG.skb dinamis saat user pilih prodi
+function buildSkbCfg(prodiKey) {
+  const p = SKB_PRODI[prodiKey];
+  EXAM_CFG.skb = {
+    timer: 90 * 60,
+    prodiKey,
+    prodiLabel: p.label,
+    subtests: [{ key: p.subtestKey, label: p.subtestFull, total: p.total }],
+  };
+}
 
 // =============================================================
 // STATE
@@ -965,7 +997,8 @@ function renderLeaderboard(entries) {
 }
 
 // ── Modal nama 2-step ────────────────────────────────────────
-let pendingExamType = null;
+let pendingExamType  = null;
+let pendingSkbProdi  = null; // prodi SKB yang dipilih user
 
 function openModalNama(examType) {
   pendingExamType = examType;
@@ -987,8 +1020,12 @@ function backToStep1() {
 }
 
 function goToStep2() {
-  const nama = document.getElementById('input-nama').value.trim();
+  const inputVal = document.getElementById('input-nama').value.trim();
+  // Pakai nama dari input ATAU dari state (ketika dipanggil dari "Ganti Prodi")
+  const nama = inputVal || S.namaPeserta;
   if (!nama) {
+    document.getElementById('modal-step1').style.display = 'block';
+    document.getElementById('modal-step2').style.display = 'none';
     document.getElementById('input-nama').focus();
     document.getElementById('input-nama').style.borderColor = 'var(--red)';
     setTimeout(() => document.getElementById('input-nama').style.borderColor = '', 1500);
@@ -1027,23 +1064,27 @@ function goToStep2() {
       `).join('')}
       <div style="margin-top:4px"></div>`;
   } else {
-    step2Title.textContent = 'Konfirmasi SKB Akuntansi';
-    step2Desc.textContent  = `Halo ${nama}! Klik mulai untuk memulai SKB Akuntansi.`;
+    // SKB — tampilkan pilihan prodi
+    step2Title.textContent = 'Pilih Program Studi SKB';
+    step2Desc.textContent  = `Halo ${nama}! Pilih prodi ujian SKB kamu:`;
     btnsEl.innerHTML = `
-      <p style="font-size:.75rem;color:var(--textsub);margin-bottom:12px;background:var(--light);padding:8px 10px;border-radius:8px;line-height:1.5">
-        Soal diambil otomatis dari database.
+      <p style="font-size:.75rem;color:var(--textsub);margin-bottom:14px;background:var(--light);padding:8px 10px;border-radius:8px;line-height:1.5">
+        Pilih prodi sesuai formasi yang kamu lamar. Soal diambil otomatis dari database.
       </p>
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
-        <div style="font-size:1.3rem;width:32px;text-align:center;flex-shrink:0">📊</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:800;font-size:.9rem;color:var(--text)">SKB Akuntansi</div>
-          <div style="font-size:.72rem;color:var(--textsub);margin-top:1px">100 soal · Akuntansi Pemerintahan, Perpajakan, Audit</div>
+      ${Object.entries(SKB_PRODI).map(([key, p]) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:1.4rem;width:36px;text-align:center;flex-shrink:0">${p.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:.9rem;color:var(--text)">${p.label}</div>
+            <div style="font-size:.72rem;color:var(--textsub);margin-top:2px;line-height:1.4">${p.desc}</div>
+          </div>
+          <button onclick="selectSkbProdi('${key}')"
+            style="padding:9px 16px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            ▶ Pilih
+          </button>
         </div>
-        <button onclick="startFromModal('skb','SKB')"
-          style="padding:9px 18px;border:none;background:var(--green);color:#fff;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;flex-shrink:0">
-          ▶ Mulai
-        </button>
-      </div>`;
+      `).join('')}
+      <div style="margin-top:4px"></div>`;
   }
 
   document.getElementById('modal-step1').style.display = 'none';
@@ -1061,6 +1102,48 @@ document.getElementById('input-nama').addEventListener('keydown', e => {
 async function startFromModal(examType, startSubtest) {
   closeModalNama();
   await quickStart(examType, startSubtest, 'db');
+}
+
+// Dipanggil saat user klik Pilih prodi SKB
+function selectSkbProdi(prodiKey) {
+  pendingSkbProdi = prodiKey;
+  const p    = SKB_PRODI[prodiKey];
+  const nama = S.namaPeserta;
+
+  // Ganti konten step2 menjadi konfirmasi prodi yang dipilih
+  document.getElementById('modal-step2-title').textContent = `Konfirmasi — ${p.label}`;
+  document.getElementById('modal-step2-desc').textContent  = `Halo ${nama}! Kamu akan mengerjakan ujian berikut:`;
+  document.getElementById('exam-select-btns').innerHTML = `
+    <div style="background:var(--light);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <span style="font-size:2rem">${p.icon}</span>
+        <div>
+          <div style="font-weight:800;font-size:1rem;color:var(--text)">${p.label}</div>
+          <div style="font-size:.75rem;color:var(--textsub);margin-top:2px">${p.subtestFull}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+        ${p.tags.map(t => `<span style="background:#d4f4e2;color:var(--green);font-size:.71rem;font-weight:600;padding:3px 9px;border-radius:10px">${t}</span>`).join('')}
+      </div>
+      <div style="font-size:.78rem;color:var(--textsub);line-height:1.6">
+        ⏱️ <strong>90 menit</strong> &nbsp;·&nbsp; 📝 <strong>${p.total} soal</strong> &nbsp;·&nbsp; 🤖 AI Generated
+      </div>
+    </div>
+    <button onclick="startSkbFromModal()"
+      style="width:100%;padding:12px;border:none;background:linear-gradient(135deg,var(--green),#27ae60);color:#fff;border-radius:8px;font-size:.92rem;font-weight:700;cursor:pointer;margin-bottom:8px">
+      ▶ Mulai Ujian ${p.label}
+    </button>
+    <button onclick="goToStep2()" style="width:100%;padding:9px;background:var(--light);border:1.5px solid var(--border);border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;color:var(--text)">
+      ← Ganti Prodi
+    </button>`;
+}
+
+async function startSkbFromModal() {
+  const prodiKey = pendingSkbProdi;
+  if (!prodiKey || !SKB_PRODI[prodiKey]) return;
+  buildSkbCfg(prodiKey); // set EXAM_CFG.skb sesuai prodi
+  closeModalNama();
+  await quickStart('skb', SKB_PRODI[prodiKey].subtestKey, 'db');
 }
 
 // ── Simpan hasil ke leaderboard ───────────────────────────────
@@ -1696,8 +1779,9 @@ function submitExam() {
     document.getElementById('skb-info').style.display='block';
     saveToLeaderboard('skb', total, {});
 
+    const namaProdi = EXAM_CFG.skb?.prodiLabel || 'SKB';
     document.getElementById('skb-desc-text').textContent=
-      `Skor SKB Akuntansi: ${total} dari ${qs.length*5} poin. Akan diakumulasi dengan SKD untuk penetapan peringkat akhir.`;
+      `Skor ${namaProdi}: ${total} dari ${qs.length*5} poin. Akan diakumulasi dengan SKD untuk penetapan peringkat akhir.`;
   }
 
   document.getElementById('review-body').innerHTML = qs.map((q, i) => {
