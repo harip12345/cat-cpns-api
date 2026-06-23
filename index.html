@@ -815,13 +815,13 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     <button class="btn-chat-close" onclick="toggleChat()" title="Tutup">✕</button>
   </div>
   <div class="chat-messages" id="chat-messages">
-    <div class="chat-bubble ai">👋 Halo! Saya Asisten CPNS kamu. Tanya materi TWK, TIU, TKP, atau minta penjelasan soal yang sedang kamu kerjakan!</div>
+    <div class="chat-bubble ai">👋 Halo! Saya Asisten Ujian kamu. Saya bisa membantu pembahasan soal TWK, TIU, TKP, SKB, maupun soal English (Grammar & Reading). Klik tombol di bawah atau ketik pertanyaanmu!</div>
   </div>
-  <div class="chat-quick-btns">
-    <button class="chat-quick-btn" onclick="chatQuick('Jelaskan soal ini')">💡 Jelaskan soal ini</button>
-    <button class="chat-quick-btn" onclick="chatQuick('Apa kunci jawaban & alasannya?')">🔑 Kunci & alasan</button>
-    <button class="chat-quick-btn" onclick="chatQuick('Tips menjawab soal TKP')">🎯 Tips TKP</button>
-    <button class="chat-quick-btn" onclick="chatQuick('Strategi passing grade SKD')">📊 Strategi PG</button>
+  <div class="chat-quick-btns" id="chat-quick-btns">
+    <button class="chat-quick-btn" id="qbtn-explain" onclick="chatQuick('Jelaskan soal ini dan mengapa jawaban yang benar adalah yang benar')">💡 Jelaskan soal</button>
+    <button class="chat-quick-btn" id="qbtn-key" onclick="chatQuick('Tunjukkan pembahasan lengkap langkah demi langkah')">📝 Pembahasan lengkap</button>
+    <button class="chat-quick-btn" id="qbtn-wrong" onclick="chatQuick('Mengapa opsi-opsi yang salah itu salah?')">❌ Kenapa opsi lain salah?</button>
+    <button class="chat-quick-btn" id="qbtn-tip" onclick="chatQuick('Berikan tips & trik cepat untuk tipe soal ini')">🎯 Tips & trik</button>
   </div>
   <div class="chat-input-row">
     <textarea class="chat-input" id="chat-input"
@@ -944,11 +944,74 @@ function updateChatContext() {
   const ctxEl = document.getElementById('chat-ctx-label');
   if (!ctxEl) return;
   if (!S.questions.length) {
-    ctxEl.textContent = 'Tanya apa saja seputar materi CPNS';
+    ctxEl.textContent = 'Tanya apa saja seputar materi ujian';
     return;
   }
   const q = S.questions[S.currentQ];
-  if (q) ctxEl.textContent = 'Konteks: Soal ' + (S.currentQ + 1) + ' — ' + (q.subtestFull || q.subtest);
+  if (!q) return;
+
+  ctxEl.textContent = 'Konteks: Soal ' + (S.currentQ + 1) + ' — ' + (q.subtestFull || q.subtest);
+
+  // Update quick buttons sesuai tipe soal
+  const isEnglish = ['ERRORREC', 'READCOMP'].includes(q.subtest);
+  const isTKP     = q.tipe === 'tkp';
+  const isNumeric  = q.subtest === 'TIU';
+  const isReading  = q.subtest === 'READCOMP';
+
+  const explainBtn = document.getElementById('qbtn-explain');
+  const keyBtn     = document.getElementById('qbtn-key');
+  const wrongBtn   = document.getElementById('qbtn-wrong');
+  const tipBtn     = document.getElementById('qbtn-tip');
+
+  if (!explainBtn) return;
+
+  if (isReading) {
+    explainBtn.textContent = '💡 Jelaskan passage ini';
+    explainBtn.onclick = () => chatQuick('Jelaskan isi passage dan poin-poin penting yang perlu diperhatikan');
+    keyBtn.textContent = '🔍 Analisis soal';
+    keyBtn.onclick = () => chatQuick('Analisis soal ini dan jelaskan kunci jawabannya berdasarkan isi passage');
+    wrongBtn.textContent = '❌ Kenapa opsi lain salah?';
+    wrongBtn.onclick = () => chatQuick('Jelaskan mengapa opsi-opsi yang salah tidak tepat berdasarkan passage');
+    tipBtn.textContent = '🎯 Strategi reading';
+    tipBtn.onclick = () => chatQuick('Berikan strategi cepat menjawab soal reading comprehension di tes BUMN');
+  } else if (isEnglish) {
+    explainBtn.textContent = '💡 Jelaskan grammar';
+    explainBtn.onclick = () => chatQuick('Jelaskan aturan grammar yang diuji di soal ini dan mengapa jawaban benar adalah yang benar');
+    keyBtn.textContent = '✍️ Identifikasi error';
+    keyBtn.onclick = () => chatQuick('Identifikasi bagian yang salah dan jelaskan aturan grammar yang dilanggar');
+    wrongBtn.textContent = '❌ Kenapa opsi lain salah?';
+    wrongBtn.onclick = () => chatQuick('Jelaskan mengapa setiap opsi yang salah tidak tepat secara grammar');
+    tipBtn.textContent = '🎯 Tips Structure';
+    tipBtn.onclick = () => chatQuick('Berikan tips menjawab soal Structure & Written Expression di tes BUMN');
+  } else if (isTKP) {
+    explainBtn.textContent = '💡 Jelaskan skenario';
+    explainBtn.onclick = () => chatQuick('Jelaskan skenario soal ini dan mengapa satu opsi lebih baik dari yang lain');
+    keyBtn.textContent = '📊 Ranking skor';
+    keyBtn.onclick = () => chatQuick('Tampilkan ranking skor semua opsi dari tertinggi ke terendah beserta alasannya');
+    wrongBtn.textContent = '🤝 Nilai BerAKHLAK';
+    wrongBtn.onclick = () => chatQuick('Kaitkan jawaban terbaik dengan nilai ASN BerAKHLAK yang relevan');
+    tipBtn.textContent = '🎯 Tips TKP';
+    tipBtn.onclick = () => chatQuick('Berikan tips strategi menjawab soal TKP secara umum');
+  } else if (isNumeric) {
+    explainBtn.textContent = '💡 Jelaskan soal';
+    explainBtn.onclick = () => chatQuick('Jelaskan soal ini dan tunjukkan cara mengerjakannya langkah demi langkah secara vertikal');
+    keyBtn.textContent = '🔢 Hitung step-by-step';
+    keyBtn.onclick = () => chatQuick('Tunjukkan perhitungan lengkap step by step secara vertikal ke bawah, jangan ditulis menyamping');
+    wrongBtn.textContent = '⚡ Cara cepat';
+    wrongBtn.onclick = () => chatQuick('Adakah trik atau cara cepat untuk menjawab soal tipe ini tanpa hitung panjang?');
+    tipBtn.textContent = '🎯 Tips numerik';
+    tipBtn.onclick = () => chatQuick('Berikan tips mengerjakan soal numerik TIU dengan cepat dan akurat');
+  } else {
+    // Default (TWK, SKB, dll)
+    explainBtn.textContent = '💡 Jelaskan soal';
+    explainBtn.onclick = () => chatQuick('Jelaskan soal ini dan mengapa jawaban yang benar adalah yang benar');
+    keyBtn.textContent = '📝 Pembahasan lengkap';
+    keyBtn.onclick = () => chatQuick('Tunjukkan pembahasan lengkap soal ini beserta referensi hukum atau teori yang relevan');
+    wrongBtn.textContent = '❌ Kenapa opsi lain salah?';
+    wrongBtn.onclick = () => chatQuick('Mengapa opsi-opsi yang salah itu salah?');
+    tipBtn.textContent = '🎯 Tips & trik';
+    tipBtn.onclick = () => chatQuick('Berikan tips & trik cepat untuk tipe soal ini');
+  }
 }
 
 function buildQuestionContext() {
@@ -1605,9 +1668,16 @@ async function quickStart(examType, startSubtest, mode = 'db') {
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
 
-  // Sambutan awal chat dengan nama peserta
+  // Sambutan awal chat sesuai tipe ujian
+  const chatGreeting = {
+    skd:              'SKD (TWK, TIU, TKP)',
+    skb:              'SKB',
+    english_errorrec: 'Structure & Written Expression 🇬🇧',
+    english_readcomp: 'Reading Comprehension 🇬🇧',
+  };
+  const ujianLabel = chatGreeting[examType] || 'ujian ini';
   document.getElementById('chat-messages').innerHTML =
-    '<div class="chat-bubble ai">👋 Halo <strong>' + S.namaPeserta + '</strong>! Saya siap bantu kamu. Klik tombol <strong>💡 Jelaskan soal ini</strong> untuk meminta penjelasan soal yang sedang kamu kerjakan!</div>';
+    '<div class="chat-bubble ai">👋 Halo <strong>' + S.namaPeserta + '</strong>! Saya siap membantu kamu di sesi <strong>' + ujianLabel + '</strong>. Klik soal lalu gunakan tombol di bawah untuk minta penjelasan!</div>';
 
   renderNavGrid();
   renderQuestion(0);
