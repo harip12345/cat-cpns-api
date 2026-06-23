@@ -270,6 +270,16 @@ STRUCTURE — DISTRACTOR RULES:
 - Options B, C, D each represent a different common mistake
 - NEVER make all wrong options obviously wrong — each distractor must seem plausible at first glance
 
+CRITICAL VERIFICATION FOR INVERSION QUESTIONS:
+When writing inversion sentences (Not only / Seldom / No sooner / Hardly / Never):
+Structure: [Negative adverb] + [AUXILIARY] + [SUBJECT] + [main verb]...
+The auxiliary (has/have/was/were/does/do/did) must agree with the SUBJECT that comes AFTER the auxiliary — NOT with the negative adverb.
+BEFORE finalizing, fill in your answer and check: what is the subject? Is it singular or plural?
+Example CORRECT: "Not only HAVE the financial reports been scrutinized..." → subject = "the financial reports" (plural) → HAVE ✓
+Example CORRECT: "Not only HAS the financial report been scrutinized..." → subject = "the financial report" (singular) → HAS ✓
+If you choose 'has' as the answer, the subject MUST be singular. If you choose 'have', the subject MUST be plural.
+NEVER put a plural subject with 'has' or a singular subject with 'have' as the correct answer.
+
 STRUCTURE EXAMPLE (follow this format exactly):
 {
   "id": 1,
@@ -331,10 +341,17 @@ WRITTEN EXPRESSION EXAMPLE (follow this format exactly):
 ════════════════════════════════════════════════
 ABSOLUTE RULES FOR BOTH PARTS
 ════════════════════════════════════════════════
-1. SELF-CHECK BEFORE OUTPUTTING each question:
-   - Structure: Insert correct answer into blank → is the sentence 100% grammatical? YES/NO
-   - Written Expression: Is the sentence complete (no blanks)? Is exactly ONE part wrong? Are the other 3 parts clearly correct?
-   - If NO to any check → rewrite the question entirely
+1. MANDATORY SELF-CHECK BEFORE OUTPUTTING each question:
+   For STRUCTURE:
+   a) Insert the correct answer into the blank → read the full sentence aloud mentally → is it 100% grammatical? If NO → rewrite.
+   b) For inversion questions: identify the subject AFTER the auxiliary → verify singular/plural agreement → does your chosen auxiliary match? If NO → fix the answer or rewrite the sentence.
+   c) Try inserting each WRONG option → confirm the sentence becomes grammatically incorrect. If a wrong option also works → rewrite the distractors.
+
+   For WRITTEN EXPRESSION:
+   a) Is the sentence complete with no blanks? If NO → rewrite as Structure or fix the sentence.
+   b) Is exactly ONE part wrong? If more than one part is wrong → rewrite.
+   c) Are the other three parts unambiguously correct? If any correct part could be argued as wrong → rewrite.
+   d) Fix the error part → does it produce a perfect sentence? If NO → the error is misidentified → rewrite.
 
 2. CONTEXT: All sentences must relate to Indonesian business/BUMN/corporate/government contexts
 
