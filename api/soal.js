@@ -235,9 +235,125 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 "pembahasanSingkat":"Analisis mengapa B benar berdasarkan teori/SOP/regulasi. Mengapa opsi lain salah.",
 "referensi":"UU/PerMenSos/PP yang spesifik dan masih berlaku",
 "nilai":{"benar":5,"salah":0}}]`,
+
+  ERRORREC: `You are a senior English language test specialist designing Structure & Written Expression questions for the Indonesian BUMN (State-Owned Enterprises) Joint Recruitment Test 2025, following the TOEFL ITP / BUMN English proficiency test format.
+
+THIS SECTION HAS TWO DISTINCT QUESTION TYPES. Each batch must contain BOTH types in this exact proportion:
+- STRUCTURE questions: 15 out of 40 (first 15 questions, id 1–15)
+- WRITTEN EXPRESSION questions: 25 out of 40 (questions 16–40)
+
+━━━ PART 1: STRUCTURE (Questions 1–15) ━━━
+FORMAT: An incomplete English sentence with ONE blank. Choose the option (A, B, C, D) that BEST completes the sentence grammatically and meaningfully.
+Sentences must be complex/compound — not simple one-clause sentences.
+Contexts: corporate governance, BUMN operations, Indonesian business law, financial reporting, HR management.
+
+STRUCTURE TOPICS TO COVER (rotate strictly):
+1. Subordinate clauses — relative clauses (who/which/that/whose), noun clauses (that/whether/wh-), adverb clauses (although/because/since/while/unless)
+2. Gerund vs infinitive as subject or object — "Swimming is..." / "It is difficult to..."
+3. Passive voice — simple, progressive, perfect forms
+4. Inversion — "Not only did... but also", "Seldom has...", "No sooner had... than"
+5. Parallel structure — correlative conjunctions (both...and, not only...but also, either...or)
+6. Conditional sentences — Type 1, 2, 3, mixed
+7. Comparatives & superlatives — "the more... the more", "as... as", "no less... than"
+8. Participle phrases — "Having completed...", "Being appointed...", "Known for..."
+9. Causative verbs — "have/make/let/get + object + verb form"
+10. Article usage with abstract/proper/uncountable nouns in formal contexts
+
+STRUCTURE DISTRACTOR RULES:
+- All 4 options must be grammatically plausible at first glance.
+- Wrong options must represent the most common student errors (e.g. wrong tense, wrong connector, gerund vs infinitive swap).
+- The correct answer is the ONLY one that completes the sentence with perfect grammar AND meaning.
+
+━━━ PART 2: WRITTEN EXPRESSION (Questions 16–40) ━━━
+FORMAT: A complete English sentence with FOUR underlined parts labeled (A), (B), (C), (D). Exactly ONE underlined part contains a grammatical error. The candidate identifies which part (A/B/C/D) is incorrect.
+Sentences must be contextually relevant to professional/business/BUMN settings.
+
+WRITTEN EXPRESSION ERROR TYPES (rotate strictly, no repetition within a batch):
+1. Subject-verb agreement (collective nouns, indefinite pronouns, inverted sentences)
+2. Verb tense (wrong tense, tense inconsistency, sequence of tenses)
+3. Word form (noun/verb/adjective/adverb confusion — "economy" vs "economic" vs "economical")
+4. Pronoun case / antecedent disagreement
+5. Article errors (a/an/the with countable, uncountable, proper nouns)
+6. Preposition in fixed expressions ("responsible for" not "responsible of")
+7. Parallel structure in lists or comparisons
+8. Adjective vs adverb confusion ("good/well", "hard/hardly", comparatives)
+9. Conditional verb form errors (Type 1, 2, 3)
+10. Gerund vs infinitive after specific verbs ("avoid doing", "suggest doing", "decide to")
+11. Passive voice errors (wrong auxiliary or past participle)
+12. Redundancy / double negation
+
+WRITTEN EXPRESSION RULES:
+- The THREE correct underlined parts must be GRAMMATICALLY PERFECT — no ambiguity.
+- Error must be CLEAR and UNAMBIGUOUS.
+- Distribute error positions (A/B/C/D) evenly across the batch.
+- B2–C1 difficulty level.
+
+GLOBAL STRICT RULES:
+- NEVER repeat the same grammar topic in the same batch.
+- All sentences must be at B2–C1 level.
+- Contexts: corporate communication, BUMN policy, finance, HR, infrastructure, national development.
+- Generate exactly the number of questions requested (count field from user).
+
+Output ONLY a valid JSON array (no markdown, no comments, no other text).
+Use this schema — include "questionPart" field to distinguish the two types:
+
+For STRUCTURE questions (id 1–15):
+{"id":1,"subtest":"ERRORREC","subtestFull":"Structure & Written Expression","tipe":"pilihan_ganda",
+"questionPart":"Structure",
+"tingkatKesulitan":"sedang",
+"grammarTopic":"brief topic label (e.g. Subordinate Clause — Relative Clause)",
+"text":"The regional manager, _____ has overseen the East Java division for five years, was promoted to national director last quarter.",
+"options":{"A":"who","B":"which","C":"whom","D":"whose"},
+"kunciJawaban":"A",
+"pembahasanSingkat":"'Who' is correct because the relative clause modifies 'the regional manager', a person, used as the subject of the clause ('has overseen'). 'Which' is for things, 'whom' is object case, 'whose' shows possession.",
+"nilai":{"benar":5,"salah":0}}
+
+For WRITTEN EXPRESSION questions (id 16–40):
+{"id":16,"subtest":"ERRORREC","subtestFull":"Structure & Written Expression","tipe":"pilihan_ganda",
+"questionPart":"Written Expression",
+"tingkatKesulitan":"sedang",
+"errorType":"brief error type label (e.g. Subject-Verb Agreement)",
+"text":"The board of directors (A) have decided to postpone (B) the annual general meeting (C) until a new venue (D) is confirmed.",
+"options":{"A":"The board of directors","B":"have decided to postpone","C":"the annual general meeting","D":"is confirmed"},
+"kunciJawaban":"B",
+"pembahasanSingkat":"'The board of directors' is a collective noun treated as singular in formal contexts. Correct form is 'has decided', not 'have decided'. Error is in (B).",
+"nilai":{"benar":5,"salah":0}}`,
+
+  READCOMP: `You are a senior English language test specialist designing Reading Comprehension questions for the Indonesian BUMN (State-Owned Enterprises) Joint Recruitment Test 2025.
+
+TEST FORMAT — READING COMPREHENSION:
+Each question is based on a reading passage. Generate ONE passage followed by FIVE questions about that passage. Each question has 5 answer options (A–E).
+Passages must be relevant to professional/business/economic contexts in Indonesia (BUMN management, sustainability, digital transformation, HR policy, finance, infrastructure, national development).
+Passage length: 200–280 words. Difficulty level: B2–C1.
+
+QUESTION TYPES (include all 5 types per passage — one each):
+1. MAIN IDEA — What is the main idea/purpose of the passage?
+2. SPECIFIC DETAIL — According to the passage, which of the following is stated...?
+3. INFERENCE — It can be inferred from the passage that...?
+4. VOCABULARY IN CONTEXT — The word/phrase "X" in paragraph Y most nearly means...?
+5. AUTHOR'S PURPOSE / TONE — The author mentions X in order to... / The author's tone in this passage is...?
+
+STRICT RULES:
+- All questions must be answerable SOLELY from the passage — no outside knowledge required.
+- Wrong answer choices (distractors) must be plausible but clearly incorrect upon careful reading.
+- Vocabulary questions must use words that have multiple meanings — the correct answer fits the passage context specifically.
+- NEVER write questions where the answer is so obvious it can be found by scanning one word.
+- Each batch must use a DIFFERENT passage topic.
+
+Output ONLY a valid JSON array (no markdown, no comments, no other text).
+Return an array of 5 question objects, all referencing the SAME passage via a "passage" field:
+[{"id":1,"subtest":"READCOMP","subtestFull":"Reading Comprehension","tipe":"pilihan_ganda",
+"tingkatKesulitan":"sedang",
+"questionType":"Main Idea|Specific Detail|Inference|Vocabulary in Context|Author's Purpose",
+"passage":"Full passage text here (200-280 words). ALL 5 questions in this batch must use this EXACT same passage.",
+"text":"Question stem here",
+"options":{"A":"...","B":"...","C":"...","D":"...","E":"..."},
+"kunciJawaban":"C",
+"pembahasanSingkat":"Clear explanation referencing the specific part of the passage that supports the answer.",
+"nilai":{"benar":5,"salah":0}}]`,
 };
 
-const VALID = { skd:['TWK','TIU','TKP'], skb:['SKBAKUNTAN','SKBKESSOS'] };
+const VALID = { skd:['TWK','TIU','TKP'], skb:['SKBAKUNTAN','SKBKESSOS'], english:['ERRORREC','READCOMP'] };
 
 // ─── Firebase ──────────────────────────────────────────────────
 async function getToken() {
@@ -389,7 +505,7 @@ module.exports = async function handler(req, res) {
   const count = Math.min(15, Math.max(1, parseInt(cRaw||'10',10)));
   const bIdx  = parseInt(batchIndex)||0;
 
-  if (!VALID[type])                return res.status(400).json({success:false,error:'"examType" harus "skd"/"skb".'});
+  if (!VALID[type])                return res.status(400).json({success:false,error:'"examType" harus "skd"/"skb"/"english".'});
   if (!VALID[type].includes(sub))  return res.status(400).json({success:false,error:`"subtest" harus: ${VALID[type].join(', ')}.`});
 
   const apiKey = process.env.GROQ_API_KEY;
