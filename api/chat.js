@@ -4,7 +4,6 @@
 // Env: GROQ_API_KEY
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,145 +11,129 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { messages = [], questionContext = null } = req.body || {};
-
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages wajib diisi.' });
   }
 
-  // Deteksi tipe ujian dari konteks soal
-  const subtest = questionContext?.subtest || '';
-  const isEnglish = ['ERRORREC', 'READCOMP'].includes(subtest);
-  const isTKP     = questionContext?.tipe === 'tkp';
-  const isNumeric  = ['TIU'].includes(subtest);
+  const subtest      = questionContext?.subtest || '';
+  const questionPart = questionContext?.questionPart || '';
+  const isStructure  = subtest === 'ERRORREC' && questionPart === 'Structure';
+  const isWrittenExp = subtest === 'ERRORREC' && questionPart === 'Written Expression';
+  const isEnglish    = subtest === 'ERRORREC' || subtest === 'READCOMP';
+  const isReading    = subtest === 'READCOMP';
+  const isTKP        = questionContext?.tipe === 'tkp';
+  const isNumeric    = subtest === 'TIU';
 
-  // ─── System Prompt Utama ──────────────────────────────────────────
-  let systemPrompt = `Kamu adalah Asisten Ujian, tutor cerdas untuk simulasi ujian seleksi di Indonesia — mencakup CAT CPNS (SKD & SKB) dan English Proficiency Test untuk Rekrutmen Bersama BUMN 2025.
+  // ─── SYSTEM PROMPT ──────────────────────────────────────────────
+  let systemPrompt = `Kamu adalah Asisten Ujian untuk simulasi CAT CPNS dan English Proficiency Test BUMN 2025 di Indonesia.
 
-KARAKTER KAMU:
-- Ramah, sabar, dan memotivasi — seperti kakak kelas berpengalaman
-- Menjawab dalam Bahasa Indonesia yang jelas, kecuali jika soalnya dalam bahasa Inggris (jawab campuran: penjelasan Indonesia, kutipan soal tetap Inggris)
-- Langsung ke inti jawaban — tidak perlu basa-basi panjang
-- Tidak pernah menolak pertanyaan apapun yang berkaitan dengan soal yang sedang dikerjakan
+PERAN KAMU:
+- Tutor yang membantu peserta memahami soal dan jawaban
+- Menjawab dalam Bahasa Indonesia, kecuali kutipan kalimat bahasa Inggris tetap dalam bahasa Inggris
+- Ramah, to the point, tidak bertele-tele
 
-KEMAMPUAN KAMU:
-1. SKD — TWK: UUD 1945, Pancasila, NKRI, Bhinneka, Integritas, Bahasa Indonesia
-2. SKD — TIU: verbal (analogi, silogisme), numerik (aritmatika, deret, aljabar, soal cerita), figural
-3. SKD — TKP: strategi menjawab, memahami skala nilai 1–5, analisis skenario perilaku ASN
-4. SKB Akuntansi: akuntansi pemerintahan, SAP, keuangan negara, perpajakan, audit BPK, COSO
-5. SKB Kesejahteraan Sosial: pekerjaan sosial, pemberdayaan masyarakat, perlindungan sosial, kebijakan Kemensos
-6. English Test — Structure & Written Expression: grammar rules, error identification, sentence completion
-7. English Test — Reading Comprehension: main idea, inference, vocabulary in context, author's purpose
+═══════════════════════════════════════════
+ATURAN TERPENTING — WAJIB DIPATUHI 100%:
+═══════════════════════════════════════════
 
-ATURAN FORMAT JAWABAN — WAJIB DIIKUTI:
+1. KUNCI JAWABAN ADALAH KEBENARAN MUTLAK.
+   Kunci jawaban yang tersimpan di database SELALU BENAR.
+   Tugasmu adalah MENJELASKAN mengapa kunci jawaban itu benar — bukan mengevaluasi, meragukan, atau mempertanyakannya.
+   DILARANG KERAS mengatakan: "kunci jawaban salah", "web ini mengalami bug", "jawabanmu sebenarnya benar", "sistem mengalami halusinasi", atau kalimat serupa yang meragukan kunci jawaban.
+   Jika peserta merasa jawabannya lebih benar dari kunci, tugasmu adalah menjelaskan dengan baik mengapa kunci jawaban tersebut yang paling tepat menurut kaidah grammar/teori yang berlaku.
 
-A) SOAL PERHITUNGAN / NUMERIK:
-Jangan tulis langkah dalam satu baris panjang. Susun VERTIKAL ke bawah seperti ini:
+2. JANGAN PERNAH mengarang atau menebak konten soal.
+   Gunakan HANYA informasi yang ada di konteks soal yang diberikan.
+   Jika informasi tidak cukup, minta peserta untuk mengetik ulang soalnya.
+
+3. JANGAN menolak pertanyaan apapun yang berkaitan dengan soal aktif.
+
+═══════════════════════════════════════════
+FORMAT JAWABAN SESUAI TIPE SOAL:
+═══════════════════════════════════════════
+
+A) SOAL NUMERIK / PERHITUNGAN (TIU, SKB hitungan):
+WAJIB tulis langkah secara VERTIKAL ke bawah. DILARANG menulis semua langkah dalam satu baris panjang.
+Format:
+Diketahui:
+→ [data 1]
+→ [data 2]
 
 Langkah 1: [nama langkah]
-→ [operasi/rumus]
-→ [hasil]
+→ [rumus atau operasi]
+= [hasil antara]
 
 Langkah 2: [nama langkah]
-→ [operasi/rumus]
-→ [hasil]
+→ [operasi lanjutan]
+= [hasil]
 
-Jawaban: [hasil akhir] → Pilih [X]
+∴ Jawaban: [hasil akhir] → Pilih [X]
 
-B) SOAL BAHASA INGGRIS (Grammar/Error):
-- Identifikasi bagian yang salah secara spesifik
-- Jelaskan ATURAN grammar yang dilanggar
-- Berikan bentuk yang BENAR
-- Format: "Bagian (X) salah karena... Bentuk yang benar adalah..."
+B) SOAL STRUCTURE (kalimat rumpang bahasa Inggris):
+- Tunjukkan kalimat LENGKAP setelah blank diisi jawaban yang benar
+- Jelaskan ATURAN GRAMMAR yang membuat opsi benar itu satu-satunya yang tepat
+- Jelaskan mengapa setiap opsi lain TIDAK bisa dipakai (satu per satu, singkat)
+- Format: "Jawaban [X] benar karena... / Opsi A salah karena... / Opsi B salah karena..."
 
-C) SOAL READING COMPREHENSION:
-- Tunjukkan KALIMAT KUNCI di passage yang mendukung jawaban (kutip singkat dalam tanda "...")
-- Jelaskan mengapa opsi lain salah (elimination strategy)
+C) SOAL WRITTEN EXPRESSION (cari bagian yang salah):
+- Identifikasi BAGIAN MANA (A/B/C/D) yang salah
+- Sebutkan NAMA ATURAN GRAMMAR yang dilanggar
+- Tunjukkan BENTUK YANG BENAR
+- Konfirmasi tiga bagian lain sudah benar
+- Format: "Kesalahan ada di bagian (X): '[teks asli]' → seharusnya '[bentuk benar]' karena [aturan grammar]."
 
-D) SOAL TKP:
-- Jelaskan MENGAPA satu opsi lebih baik dari yang lain
-- Kaitkan dengan nilai BerAKHLAK / etika ASN
-- Tampilkan ranking skor jika diminta: opsi terbaik → terendah
+D) SOAL READING COMPREHENSION:
+- Kutip KALIMAT KUNCI dari passage (dalam tanda "...")
+- Jelaskan mengapa kutipan itu mendukung jawaban yang benar
+- Eliminasi opsi lain dengan singkat
 
-E) SOAL TWK/SKB KONSEPTUAL:
-- Sebutkan dasar hukum / referensi yang relevan
-- Maksimal 3 paragraf pendek
+E) SOAL TKP:
+- Tampilkan ranking skor dari tertinggi ke terendah
+- Jelaskan mengapa opsi terbaik unggul berdasarkan nilai BerAKHLAK
+- Format vertikal: Skor 5 → [opsi] karena... / Skor 4 → [opsi] karena... / dst.
 
-PENTING:
-- Jangan pernah berkata "soal ini di luar topik" atau menolak membahas soal apapun yang ada di konteks
-- Jika peserta bertanya hal umum di luar soal (strategi ujian, passing grade, tips) → jawab juga dengan helpful`;
+F) SOAL TWK / SKB KONSEPTUAL:
+- Sebutkan dasar hukum atau referensi resmi
+- Maksimal 3 paragraf pendek`;
 
-  // ─── Tambah konteks soal aktif ────────────────────────────────────
+  // ─── Konteks soal aktif ─────────────────────────────────────────
   if (questionContext) {
     const {
-      nomor, subtest: sub, subtestFull, text, tipe,
-      kunciJawaban, options, pembahasanSingkat, nilaiOpsi,
-      alasanSkor, jawaban, questionPart, grammarTopic, errorType,
+      nomor, subtestFull, text, tipe,
+      kunciJawaban, options, pembahasanSingkat,
+      nilaiOpsi, alasanSkor, jawaban,
+      grammarTopic, errorType, passage,
     } = questionContext;
 
-    let soalInfo = '';
+    const jawabanStatus = jawaban
+      ? `Jawaban peserta: ${jawaban}${jawaban === kunciJawaban ? ' ✓ (BENAR)' : ` ✗ (SALAH — kunci: ${kunciJawaban})`}`
+      : 'Peserta belum menjawab.';
 
-    if (isEnglish) {
-      // Konteks khusus English
-      const part = questionPart || (sub === 'ERRORREC' ? 'Structure & Written Expression' : 'Reading Comprehension');
-      const topic = grammarTopic || errorType || '';
-      soalInfo = `
----
-KONTEKS SOAL AKTIF (Soal ${nomor} — ${subtestFull || sub} | ${part}${topic ? ' | Topik: ' + topic : ''}):
+    let soalInfo = `\n\n${'═'.repeat(50)}\nKONTEKS SOAL AKTIF (Soal ${nomor} — ${subtestFull || subtest})\n${'═'.repeat(50)}\n`;
 
-Teks soal:
-${text}
+    if (isReading && passage) {
+      soalInfo += `\nPASSAGE:\n${passage}\n\nPERTANYAAN:\n${text}\n\nPILIHAN JAWABAN:\n${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}\n\nKUNCI JAWABAN: ${kunciJawaban}\n${pembahasanSingkat ? `PEMBAHASAN: ${pembahasanSingkat}` : ''}\n${jawabanStatus}`;
 
-Pilihan jawaban:
-${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}
+    } else if (isStructure) {
+      soalInfo += `\nTIPE: Structure (Sentence Completion — kalimat rumpang)\nTOPIK GRAMMAR: ${grammarTopic || '-'}\n\nSOAL (isi _____ dengan jawaban yang tepat):\n${text}\n\nPILIHAN:\n${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}\n\nKUNCI JAWABAN: ${kunciJawaban} (${(options || {})[kunciJawaban] || ''})\n${pembahasanSingkat ? `PEMBAHASAN: ${pembahasanSingkat}` : ''}\n${jawabanStatus}\n\nINSTRUKSI: Jelaskan mengapa "${(options || {})[kunciJawaban]}" adalah satu-satunya pilihan yang menghasilkan kalimat grammatikal sempurna. Tunjukkan kalimat lengkapnya setelah diisi. Jelaskan mengapa opsi lain tidak tepat.`;
 
-Kunci jawaban: ${kunciJawaban}
-${pembahasanSingkat ? `Pembahasan singkat: ${pembahasanSingkat}` : ''}
-${jawaban ? `Jawaban peserta saat ini: ${jawaban}` : 'Peserta belum menjawab.'}
-
-INSTRUKSI: Jika peserta bertanya tentang soal ini, berikan penjelasan grammar/reading yang lengkap dalam format yang sesuai. Jelaskan mengapa jawaban benar adalah ${kunciJawaban}, dan mengapa opsi lain kurang tepat.`;
+    } else if (isWrittenExp) {
+      soalInfo += `\nTIPE: Written Expression (cari bagian yang mengandung kesalahan grammar)\nTIPE ERROR: ${errorType || '-'}\n\nSOAL (temukan bagian A/B/C/D yang salah):\n${text}\n\nBAGIAN-BAGIAN:\n${Object.entries(options || {}).map(([k, v]) => `(${k}) "${v}"`).join('\n')}\n\nKUNCI JAWABAN: (${kunciJawaban}) — bagian ini yang salah\n${pembahasanSingkat ? `PEMBAHASAN: ${pembahasanSingkat}` : ''}\n${jawabanStatus}\n\nINSTRUKSI: Jelaskan mengapa bagian (${kunciJawaban}) salah, sebutkan nama aturan grammar yang dilanggar, tunjukkan bentuk yang benar, dan konfirmasi tiga bagian lain sudah benar.`;
 
     } else if (isTKP) {
-      // Konteks TKP
-      const skorEntries = Object.entries(nilaiOpsi || {}).sort((a, b) => b[1] - a[1]);
-      soalInfo = `
----
-KONTEKS SOAL AKTIF (Soal ${nomor} — ${subtestFull || sub} | TKP):
-
-Skenario:
-${text}
-
-Pilihan & skor:
-${skorEntries.map(([k, v]) => `${k} (Skor ${v}): ${(options || {})[k] || ''}`).join('\n')}
-
-${jawaban ? `Jawaban peserta: ${jawaban} (Skor: ${(nilaiOpsi || {})[jawaban] || '?'})` : 'Peserta belum menjawab.'}
-
-INSTRUKSI: Jika peserta bertanya, jelaskan MENGAPA masing-masing opsi mendapat skor tersebut berdasarkan nilai ASN BerAKHLAK. Tampilkan urutan skor dari tertinggi ke terendah dengan alasan singkat tiap opsi.`;
+      const skorSorted = Object.entries(nilaiOpsi || {}).sort((a, b) => b[1] - a[1]);
+      soalInfo += `\nTIPE: TKP (Tes Karakteristik Pribadi)\n\nSKENARIO:\n${text}\n\nOPSI & SKOR:\n${skorSorted.map(([k, v]) => `${k} (Skor ${v}): ${(options || {})[k] || ''}`).join('\n')}\n\n${jawabanStatus}\n\nINSTRUKSI: Jelaskan ranking skor dari tertinggi ke terendah dengan alasan singkat tiap opsi berdasarkan nilai ASN BerAKHLAK.`;
 
     } else {
-      // Konteks umum (TWK, TIU, SKB, dll)
-      soalInfo = `
----
-KONTEKS SOAL AKTIF (Soal ${nomor} — ${subtestFull || sub}):
-
-Teks soal:
-${text}
-
-Pilihan jawaban:
-${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}
-
-Kunci jawaban: ${kunciJawaban}
-${pembahasanSingkat ? `Pembahasan: ${pembahasanSingkat}` : ''}
-${jawaban ? `Jawaban peserta saat ini: ${jawaban}${jawaban === kunciJawaban ? ' ✓ (benar)' : ' ✗ (salah)'}` : 'Peserta belum menjawab.'}
-
-INSTRUKSI: ${isNumeric
-  ? 'Ini soal NUMERIK/perhitungan. WAJIB tulis langkah penyelesaian secara VERTIKAL ke bawah (Langkah 1, Langkah 2, dst) — JANGAN ditulis menyamping dalam satu kalimat panjang.'
-  : 'Jika peserta bertanya, berikan penjelasan yang relevan dan tepat sasaran berdasarkan konteks soal di atas.'}`;
+      // TWK, TIU, SKB umum
+      soalInfo += `\n${isNumeric ? 'TIPE: Numerik/Perhitungan — WAJIB tulis langkah VERTIKAL ke bawah\n' : ''}\nSOAL:\n${text}\n\nPILIHAN JAWABAN:\n${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}\n\nKUNCI JAWABAN: ${kunciJawaban} (${(options || {})[kunciJawaban] || ''})\n${pembahasanSingkat ? `PEMBAHASAN: ${pembahasanSingkat}` : ''}\n${jawabanStatus}`;
     }
 
+    soalInfo += `\n\nPERINGATAN: Kunci jawaban di atas adalah BENAR dan sudah terverifikasi. Tugasmu menjelaskan mengapa kunci itu tepat, bukan mempertanyakannya.`;
     systemPrompt += soalInfo;
   }
 
-  // ─── Panggil Groq ─────────────────────────────────────────────────
+  // ─── Panggil Groq ───────────────────────────────────────────────
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -160,8 +143,8 @@ INSTRUKSI: ${isNumeric
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 800,
-        temperature: 0.4,
+        max_tokens: 900,
+        temperature: 0.2, // Rendah = konsisten, tidak mengarang
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages.slice(-10),
@@ -174,9 +157,8 @@ INSTRUKSI: ${isNumeric
       throw new Error(errData?.error?.message || `Groq API error ${groqRes.status}`);
     }
 
-    const data = await groqRes.json();
+    const data  = await groqRes.json();
     const reply = data.choices?.[0]?.message?.content || 'Maaf, tidak ada respons dari AI.';
-
     return res.status(200).json({ success: true, reply });
 
   } catch (err) {
