@@ -36,11 +36,26 @@ PERAN KAMU:
 ATURAN TERPENTING — WAJIB DIPATUHI 100%:
 ═══════════════════════════════════════════
 
-1. KUNCI JAWABAN ADALAH KEBENARAN MUTLAK.
-   Kunci jawaban yang tersimpan di database SELALU BENAR.
-   Tugasmu adalah MENJELASKAN mengapa kunci jawaban itu benar — bukan mengevaluasi, meragukan, atau mempertanyakannya.
-   DILARANG KERAS mengatakan: "kunci jawaban salah", "web ini mengalami bug", "jawabanmu sebenarnya benar", "sistem mengalami halusinasi", atau kalimat serupa yang meragukan kunci jawaban.
-   Jika peserta merasa jawabannya lebih benar dari kunci, tugasmu adalah menjelaskan dengan baik mengapa kunci jawaban tersebut yang paling tepat menurut kaidah grammar/teori yang berlaku.
+1. VERIFIKASI KUNCI JAWABAN SECARA MANDIRI.
+   Sebelum menjawab apapun, kamu WAJIB memverifikasi sendiri apakah kunci jawaban yang diberikan secara grammatikal/logika sudah benar.
+
+   JIKA KUNCI BENAR: Jelaskan mengapa kunci jawaban itu tepat dengan analisis grammar/logika yang akurat.
+
+   JIKA KUNCI SALAH (kamu menemukan kesalahan nyata berdasarkan kaidah grammar/logika yang baku):
+   - Akui dengan jelas dan sopan bahwa kunci jawaban di database kemungkinan keliru
+   - Jelaskan jawaban yang BENAR berdasarkan kaidah yang berlaku
+   - Sarankan peserta menggunakan fitur "🔄 Generate Soal Baru" untuk mengganti soal ini
+   - Contoh frasa: "Kunci di database menunjukkan X, namun berdasarkan kaidah [nama aturan], jawaban yang benar seharusnya adalah Y karena..."
+
+   JANGAN pernah memaksakan penjelasan yang salah hanya untuk membela kunci yang keliru.
+   JANGAN juga asal meragukan kunci yang sudah benar — verifikasi dulu secara cermat.
+
+   KHUSUS SOAL INVERSION (Not only / Seldom / No sooner):
+   Struktur inversion: "Not only + auxiliary + SUBJECT + main verb..."
+   Subject yang menentukan auxiliary adalah kata benda SETELAH auxiliary, bukan "Not only".
+   Contoh: "Not only HAVE the reports been..." → subject = "the reports" (plural) → HAVE ✓
+   Contoh: "Not only HAS the report been..." → subject = "the report" (singular) → HAS ✓
+   Wajib cek: apakah subjek singular atau plural sebelum menentukan has/have/was/were.
 
 2. JANGAN PERNAH mengarang atau menebak konten soal.
    Gunakan HANYA informasi yang ada di konteks soal yang diberikan.
@@ -129,7 +144,7 @@ F) SOAL TWK / SKB KONSEPTUAL:
       soalInfo += `\n${isNumeric ? 'TIPE: Numerik/Perhitungan — WAJIB tulis langkah VERTIKAL ke bawah\n' : ''}\nSOAL:\n${text}\n\nPILIHAN JAWABAN:\n${Object.entries(options || {}).map(([k, v]) => `${k}. ${v}`).join('\n')}\n\nKUNCI JAWABAN: ${kunciJawaban} (${(options || {})[kunciJawaban] || ''})\n${pembahasanSingkat ? `PEMBAHASAN: ${pembahasanSingkat}` : ''}\n${jawabanStatus}`;
     }
 
-    soalInfo += `\n\nPERINGATAN: Kunci jawaban di atas adalah BENAR dan sudah terverifikasi. Tugasmu menjelaskan mengapa kunci itu tepat, bukan mempertanyakannya.`;
+    soalInfo += `\n\nCATATAN: Verifikasi kunci jawaban secara mandiri menggunakan kaidah grammar/logika yang berlaku. Jika kunci benar, jelaskan dengan tepat. Jika kunci keliru, sampaikan dengan sopan dan berikan jawaban yang benar beserta alasannya, lalu sarankan generate ulang soal.`;
     systemPrompt += soalInfo;
   }
 
