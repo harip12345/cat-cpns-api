@@ -92,6 +92,22 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
 .site-footer{background:var(--blue);color:rgba(255,255,255,.7);text-align:center;padding:18px;font-size:.78rem;margin-top:36px}
 .site-footer strong{color:#fff}
 
+/* ═══ ENGLISH TEST CARD THEME ════════════════════════════════ */
+:root{--purple:#6b21a8;--purple2:#7c3aed;--purple-light:#ede9fe;--purple-mid:#ddd6fe;}
+.exam-card.english .exam-card-accent{background:linear-gradient(90deg,var(--purple),var(--purple2))}
+.exam-card.english .exam-card-icon{background:linear-gradient(135deg,var(--purple-light),var(--purple-mid))}
+.exam-card.english .exam-card-type{color:var(--purple2)}
+.exam-card.english .subtest-tag{background:var(--purple-light);color:var(--purple2)}
+.exam-card.english .btn-start{background:linear-gradient(135deg,var(--purple),var(--purple2))}
+.exam-card.english:hover{border-color:var(--purple2)}
+.english-section-label{font-size:.76rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple2);margin-bottom:6px}
+.english-section-divider{width:44px;height:4px;background:linear-gradient(90deg,var(--purple),var(--purple2));border-radius:2px;margin:8px auto 0}
+.pg-table-wrap.english-table th{background:linear-gradient(135deg,var(--purple),var(--purple2))}
+/* English result card */
+#english-info .skor-card{border-top-color:var(--purple2)}
+#english-info .skor-value{color:var(--purple2)}
+.lb-tab.english.active{background:var(--purple2)}
+
 /* ═══ VIEW UJIAN ═════════════════════════════════════════════ */
 #view-ujian{min-height:calc(100vh - 58px)}
 .exam-topbar{background:#fff;border-bottom:2px solid var(--border);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;top:58px;z-index:90;box-shadow:0 2px 6px rgba(0,0,0,.06)}
@@ -518,6 +534,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
           </div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <button class="btn-start" onclick="openModalNama('skd')">▶ Mulai SKD</button>
+            <button onclick="copyShareLink('#/ujian/skd')" style="width:100%;padding:8px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--blue2);cursor:pointer">🔗 Salin Link Ujian SKD</button>
           </div>
         </div>
       </div>
@@ -539,6 +556,7 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
             <span class="subtest-tag">🤝 Kesejahteraan Sosial</span>
           </div>
           <button class="btn-start" onclick="openModalNama('skb')">▶ Mulai SKB</button>
+          <button onclick="copyShareLink('#/ujian/skb')" style="width:100%;padding:8px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--green);cursor:pointer;margin-top:8px">🔗 Salin Link Ujian SKB</button>
         </div>
       </div>
     </div>
@@ -552,6 +570,72 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
           <tr><td>TKP – Tes Karakteristik Pribadi</td><td>45</td><td>225</td><td><strong>166</strong></td><td>Skala 1–5, tdk ada pengurangan</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- ═══ ENGLISH PROFICIENCY TEST — BUMN 2025 ═══════════════ -->
+    <div style="margin-top:36px">
+      <div class="section-header">
+        <div class="english-section-label">🇬🇧 Rekrutmen Bersama BUMN 2025</div>
+        <div class="section-title">English Proficiency Test</div>
+        <div class="english-section-divider"></div>
+        <p style="font-size:.84rem;color:var(--textsub);margin-top:10px;line-height:1.6;max-width:520px;margin-left:auto;margin-right:auto">
+          Simulasi tes bahasa Inggris sesuai materi Rekrutmen Bersama BUMN 2025. Soal berbasis AI, langsung tersimpan di database.
+        </p>
+      </div>
+      <div class="exam-cards" style="grid-template-columns:repeat(auto-fit,minmax(290px,1fr))">
+        <div class="exam-card english">
+          <div class="exam-card-accent"></div>
+          <div class="exam-card-body">
+            <div class="exam-card-icon">✍️</div>
+            <div class="exam-card-type">Structure & Written Expression</div>
+            <div class="exam-card-title">Structure & Written Expression</div>
+            <div class="exam-card-desc">Dua tipe soal: <strong>Structure</strong> — pilih kata/frasa yang tepat untuk melengkapi kalimat; <strong>Written Expression</strong> — temukan bagian kalimat yang mengandung kesalahan tata bahasa.</div>
+            <div class="exam-card-meta">
+              <div class="meta-chip">⏱️ 25 Menit</div>
+              <div class="meta-chip">📝 40 Soal</div>
+            </div>
+            <div class="exam-card-subtests">
+              <span class="subtest-tag">Structure (15 soal)</span>
+              <span class="subtest-tag">Written Expression (25 soal)</span>
+              <span class="subtest-tag">Grammar</span>
+              <span class="subtest-tag">Sentence Completion</span>
+            </div>
+            <button class="btn-start" onclick="openModalNama('english_errorrec')">▶ Mulai Structure & Written Expression</button>
+            <button onclick="copyShareLink('#/ujian/english_errorrec')" style="width:100%;padding:8px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--purple2);cursor:pointer;margin-top:8px">🔗 Salin Link Ujian</button>
+          </div>
+        </div>
+        <div class="exam-card english">
+          <div class="exam-card-accent"></div>
+          <div class="exam-card-body">
+            <div class="exam-card-icon">📖</div>
+            <div class="exam-card-type">Reading Comprehension</div>
+            <div class="exam-card-title">Reading Comprehension</div>
+            <div class="exam-card-desc">Baca teks berbahasa Inggris lalu jawab pertanyaan tentang ide pokok, detail, inferensi, dan makna kata dalam konteks.</div>
+            <div class="exam-card-meta">
+              <div class="meta-chip">⏱️ 25 Menit</div>
+              <div class="meta-chip">📝 30 Soal</div>
+            </div>
+            <div class="exam-card-subtests">
+              <span class="subtest-tag">Main Idea</span>
+              <span class="subtest-tag">Detail Questions</span>
+              <span class="subtest-tag">Inference</span>
+              <span class="subtest-tag">Vocabulary in Context</span>
+            </div>
+            <button class="btn-start" onclick="openModalNama('english_readcomp')">▶ Mulai Reading Comprehension</button>
+            <button onclick="copyShareLink('#/ujian/english_readcomp')" style="width:100%;padding:8px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--purple2);cursor:pointer;margin-top:8px">🔗 Salin Link Ujian</button>
+          </div>
+        </div>
+      </div>
+      <div class="pg-table-wrap english-table" style="margin-top:22px">
+        <h3>📋 Materi English Proficiency Test — Rekrutmen Bersama BUMN 2025</h3>
+        <table class="pg-table">
+          <thead><tr><th>Subtes</th><th>Soal</th><th>Waktu</th><th>Sistem Nilai</th><th>Materi Utama</th></tr></thead>
+          <tbody>
+            <tr><td>Structure & Written Expression</td><td>40</td><td>25 menit</td><td>Benar=5, Salah=0</td><td>Structure: sentence completion (15 soal) · Written Expression: error identification (25 soal)</td></tr>
+            <tr><td>Reading Comprehension</td><td>30</td><td>25 menit</td><td>Benar=5, Salah=0</td><td>Main Idea, Supporting Detail, Inference, Vocabulary in Context, Author's Purpose</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
   <footer class="site-footer"><strong>Simulasi CAT CPNS</strong> · Untuk latihan · Bukan situs resmi BKN · <strong>cat.bkn.go.id</strong></footer>
@@ -669,6 +753,15 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
         <p style="font-size:.86rem;color:var(--textsub);line-height:1.7;margin-top:8px" id="skb-desc-text"></p>
       </div>
     </div>
+    <div id="english-info" style="display:none">
+      <div class="skor-utama" style="background:var(--purple-light);border:2px solid var(--purple-mid)">
+        <div class="skor-label" style="color:var(--purple2)" id="english-test-label">English Proficiency Test BUMN 2025</div>
+        <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:1.5rem;font-weight:800" id="english-level-badge">Good</span>
+        </div>
+        <p style="font-size:.84rem;color:var(--textsub);margin-top:8px;line-height:1.6" id="english-level-desc"></p>
+      </div>
+    </div>
     <div class="review-section">
       <div class="review-header" onclick="toggleReview()">📋 Tinjauan Jawaban <span id="review-toggle-icon">▼</span></div>
       <div class="review-body" id="review-body"></div>
@@ -691,9 +784,17 @@ body{font-family:'Inter',sans-serif;background:var(--light);color:var(--text);mi
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
       <div class="lb-tabs">
         <button class="lb-tab active" id="lb-tab-skd" onclick="switchLbTab('skd')">📝 SKD</button>
-        <button class="lb-tab skb"   id="lb-tab-skb" onclick="switchLbTab('skb')">🏛️ SKB</button>
+        <button class="lb-tab skb"     id="lb-tab-skb" onclick="switchLbTab('skb')">🏛️ SKB</button>
+        <button class="lb-tab english" id="lb-tab-english" onclick="switchLbTab('english')">🇬🇧 English</button>
       </div>
-      <button class="lb-refresh" onclick="loadLeaderboard()">🔄 Refresh</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="copyShareLink()" id="btn-share-lb"
+          style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--border);color:var(--blue2);border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s"
+          onmouseover="this.style.background='var(--light)'" onmouseout="this.style.background='#fff'">
+          🔗 Salin Link
+        </button>
+        <button class="lb-refresh" onclick="loadLeaderboard()">🔄 Refresh</button>
+      </div>
     </div>
     <div class="lb-table-wrap" id="lb-content">
       <div class="lb-loading">Memuat data peringkat...</div>
@@ -752,6 +853,20 @@ const EXAM_CFG = {
     timer: 90 * 60,
     subtests: [
       { key:'SKBAKUNTAN', label:'Kompetensi Bidang Akuntansi', total:100 },
+    ],
+  },
+  english_errorrec: {
+    timer: 25 * 60,
+    label: 'Structure & Written Expression',
+    subtests: [
+      { key:'ERRORREC', label:'Structure & Written Expression', total:40 },
+    ],
+  },
+  english_readcomp: {
+    timer: 25 * 60,
+    label: 'Reading Comprehension',
+    subtests: [
+      { key:'READCOMP', label:'Reading Comprehension', total:30 },
     ],
   },
 };
@@ -928,7 +1043,62 @@ function switchLbTab(tab) {
   lbCurrentTab = tab;
   document.getElementById('lb-tab-skd').classList.toggle('active', tab==='skd');
   document.getElementById('lb-tab-skb').classList.toggle('active', tab==='skb');
+  document.getElementById('lb-tab-english').classList.toggle('active', tab==='english');
   loadLeaderboard();
+}
+
+// Salin link halaman saat ini ke clipboard
+function copyShareLink(customHash) {
+  const base = window.location.origin + window.location.pathname;
+  const hash = customHash || window.location.hash || '#/';
+  const url  = base + hash;
+  navigator.clipboard.writeText(url).then(() => {
+    // Tampilkan feedback di tombol share jika ada
+    const btn = document.getElementById('btn-share-lb');
+    if (btn) {
+      const prev = btn.innerHTML;
+      btn.innerHTML = '✅ Tersalin!';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => {
+        btn.innerHTML = prev;
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    } else {
+      // Fallback toast
+      showToast('🔗 Link disalin ke clipboard!');
+    }
+  }).catch(() => {
+    // Fallback untuk browser yang tidak support clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('🔗 Link disalin ke clipboard!');
+  });
+}
+
+// Toast notifikasi ringan
+function showToast(msg) {
+  const existing = document.getElementById('share-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'share-toast';
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+    background:#1a1a2e;color:#fff;padding:10px 20px;border-radius:10px;
+    font-size:.84rem;font-weight:600;z-index:9999;
+    animation:fadeInUp .25s ease;box-shadow:0 4px 16px rgba(0,0,0,.25);
+    white-space:nowrap;pointer-events:none;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
 }
 
 async function loadLeaderboard() {
@@ -966,13 +1136,18 @@ function renderLeaderboard(entries) {
     let detailSkor = '';
     if (lbCurrentTab === 'skd') {
       detailSkor = `<div style="font-size:.72rem;color:var(--textsub);margin-top:2px">TWK:${e.skorTWK} TIU:${e.skorTIU} TKP:${e.skorTKP}</div>`;
+    } else if (lbCurrentTab === 'english') {
+      const subtestLabel = e.subtest === 'english_errorrec' ? 'Structure & Written Expression' : e.subtest === 'english_readcomp' ? 'Reading Comprehension' : 'English';
+      detailSkor = `<div style="font-size:.72rem;color:var(--textsub);margin-top:2px">${subtestLabel} · ${e.jumlahSoal} soal</div>`;
     } else {
       detailSkor = `<div style="font-size:.72rem;color:var(--textsub);margin-top:2px">${e.jumlahSoal} soal dikerjakan</div>`;
     }
 
     const statusHtml = lbCurrentTab === 'skd'
       ? `<span class="lb-status ${e.lulusSkd?'lulus':'tidak'}">${e.lulusSkd?'✅ Lulus PG':'❌ Tdk Lulus PG'}</span>`
-      : '';
+      : lbCurrentTab === 'english'
+        ? `<span class="lb-status" style="background:var(--purple-light);color:var(--purple2)">${e.totalSkor >= 125 ? '🌟 Excellent' : e.totalSkor >= 105 ? '👍 Good' : e.totalSkor >= 75 ? '✏️ Fair' : '📚 Practice'}</span>`
+        : '';
 
     return `<tr>
       <td style="text-align:center;width:50px">${rankDisplay}</td>
@@ -1063,6 +1238,31 @@ function goToStep2() {
         </div>
       `).join('')}
       <div style="margin-top:4px"></div>`;
+  } else if (examType === 'english_errorrec' || examType === 'english_readcomp') {
+    const cfg = EXAM_CFG[examType];
+    const st  = cfg.subtests[0];
+    const icon = examType === 'english_errorrec' ? '✍️' : '📖';
+    const waktu = examType === 'english_errorrec' ? '25 menit' : '25 menit';
+    step2Title.textContent = `Konfirmasi — ${cfg.label}`;
+    step2Desc.textContent  = `Halo ${nama}! Kamu akan mengerjakan:`;
+    btnsEl.innerHTML = `
+      <div style="background:var(--purple-light);border-radius:10px;padding:14px 16px;margin-bottom:14px;border-left:4px solid var(--purple2)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <span style="font-size:2rem">${icon}</span>
+          <div>
+            <div style="font-weight:800;font-size:1rem;color:var(--text)">${cfg.label}</div>
+            <div style="font-size:.75rem;color:var(--textsub);margin-top:2px">English Proficiency Test · BUMN 2025</div>
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:var(--textsub);line-height:1.8">
+          ⏱️ <strong>${waktu}</strong> &nbsp;·&nbsp; 📝 <strong>${st.total} soal</strong> &nbsp;·&nbsp; 🤖 AI Generated<br/>
+          📌 Sistem nilai: Benar = 5, Salah = 0
+        </div>
+      </div>
+      <button onclick="startFromModal('${examType}','${st.key}')"
+        style="width:100%;padding:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-radius:8px;font-size:.92rem;font-weight:700;cursor:pointer;margin-bottom:8px">
+        ▶ Mulai ${cfg.label}
+      </button>`;
   } else {
     // SKB — tampilkan pilihan prodi
     step2Title.textContent = 'Pilih Program Studi SKB';
@@ -1156,11 +1356,12 @@ async function saveToLeaderboard(examType, totalSkor, skorDetail) {
         nama:       S.namaPeserta || 'Anonim',
         examType,
         totalSkor,
-        skorTWK:    skorDetail.TWK || 0,
-        skorTIU:    skorDetail.TIU || 0,
-        skorTKP:    skorDetail.TKP || 0,
+        skorTWK:    skorDetail.TWK    || 0,
+        skorTIU:    skorDetail.TIU    || 0,
+        skorTKP:    skorDetail.TKP    || 0,
         jumlahSoal: S.questions.length,
         lulusSkd:   skorDetail.lulusAll || false,
+        subtest:    skorDetail.subtest  || examType,
         device:     navigator.userAgent.substring(0,50),
       }),
     });
@@ -1174,12 +1375,103 @@ async function saveToLeaderboard(examType, totalSkor, skorDetail) {
 document.getElementById('navbar-date').textContent =
   new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+id).classList.add('active');
-  window.scrollTo(0,0);
-  if (id === 'leaderboard') { lbCurrentTab = lbCurrentTab||'skd'; loadLeaderboard(); }
+// =============================================================
+// ROUTING — Hash URL
+// =============================================================
+// Skema:
+//   #/              → menu
+//   #/leaderboard         → leaderboard (tab terakhir)
+//   #/leaderboard/skd     → leaderboard tab SKD
+//   #/leaderboard/skb     → leaderboard tab SKB
+//   #/leaderboard/english → leaderboard tab English
+//   #/ujian/skd           → buka modal mulai SKD
+//   #/ujian/skb           → buka modal mulai SKB
+//   #/ujian/english_errorrec  → buka modal Structure & Written Expression
+//   #/ujian/english_readcomp  → buka modal Reading Comp
+
+// Tulis hash tanpa memicu hashchange listener
+function setHash(hash) {
+  history.replaceState(null, '', hash);
 }
+
+// showView — render tampilan + update hash URL
+function showView(id, { pushHash = true, lbTab = null } = {}) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (id === 'leaderboard') {
+    if (lbTab) lbCurrentTab = lbTab;
+    else lbCurrentTab = lbCurrentTab || 'skd';
+    loadLeaderboard();
+    if (pushHash) setHash('#/leaderboard/' + lbCurrentTab);
+  } else if (id === 'menu') {
+    if (pushHash) setHash('#/');
+  } else if (id === 'hasil') {
+    if (pushHash) setHash('#/hasil');
+  }
+  // view-ujian tidak punya hash publik (state tidak bisa di-restore dari URL)
+}
+
+// switchLbTab — update tab + hash
+function switchLbTab(tab) {
+  lbCurrentTab = tab;
+  document.getElementById('lb-tab-skd').classList.toggle('active',     tab === 'skd');
+  document.getElementById('lb-tab-skb').classList.toggle('active',     tab === 'skb');
+  document.getElementById('lb-tab-english').classList.toggle('active', tab === 'english');
+  loadLeaderboard();
+  setHash('#/leaderboard/' + tab);
+}
+
+// Parse hash dan jalankan aksi yang sesuai
+function handleHash() {
+  const hash  = window.location.hash || '#/';
+  const parts = hash.replace('#/', '').split('/').filter(Boolean);
+  const page  = parts[0] || '';
+  const sub   = parts[1] || '';
+
+  const activeView = document.querySelector('.view.active')?.id;
+
+  // Jangan ganggu state ujian yang sedang berjalan
+  if (activeView === 'view-ujian') return;
+
+  if (!page || page === '') {
+    showView('menu', { pushHash: false });
+  } else if (page === 'leaderboard') {
+    const tab = ['skd','skb','english'].includes(sub) ? sub : (lbCurrentTab || 'skd');
+    showView('leaderboard', { pushHash: false, lbTab: tab });
+  } else if (page === 'ujian') {
+    // Hash #/ujian/SKD → buka modal, tidak langsung mulai ujian
+    const examMap = {
+      skd:              'skd',
+      skb:              'skb',
+      english_errorrec: 'english_errorrec',
+      english_readcomp: 'english_readcomp',
+    };
+    const examType = examMap[sub?.toLowerCase()] || null;
+    // Pastikan di menu dulu, lalu buka modal
+    showView('menu', { pushHash: false });
+    if (examType) {
+      setTimeout(() => openModalNama(examType), 150);
+    }
+  } else {
+    showView('menu', { pushHash: false });
+  }
+}
+
+// Dengarkan perubahan hash (tombol Back/Forward browser)
+window.addEventListener('hashchange', handleHash);
+
+// Jalankan routing saat halaman pertama kali dibuka
+window.addEventListener('DOMContentLoaded', () => {
+  // Hanya jalankan jika ada hash yang bermakna
+  if (window.location.hash && window.location.hash !== '#/') {
+    handleHash();
+  } else {
+    setHash('#/');
+  }
+});
+
 function showLoading(msg){ document.getElementById('loader-msg').textContent=msg||'Memuat...'; document.getElementById('loading-screen').classList.add('show'); }
 function hideLoading(){ document.getElementById('loading-screen').classList.remove('show'); }
 
@@ -1299,9 +1591,17 @@ async function quickStart(examType, startSubtest, mode = 'db') {
     );
   }
 
-  showView('ujian');
+  showView('ujian', { pushHash: false }); // ujian tidak punya shareable hash
   document.getElementById('view-ujian').classList.add('view-ujian-active');
-  document.getElementById('exam-type-label').textContent = examType.toUpperCase();
+  // Set hash ke ujian/examType agar browser back button kembali ke menu
+  setHash('#/ujian/' + examType);
+  // Label di topbar ujian
+  const etLabel = {
+    skd: 'SKD', skb: 'SKB',
+    english_errorrec: '✍️ STRUCTURE & WRITTEN EXPRESSION',
+    english_readcomp: '🇬🇧 READING COMPREHENSION',
+  };
+  document.getElementById('exam-type-label').textContent = etLabel[examType] || examType.toUpperCase();
   const namaNavEl = document.getElementById('navbar-nama');
   if (namaNavEl && S.namaPeserta) namaNavEl.textContent = S.namaPeserta;
 
@@ -1742,6 +2042,7 @@ function submitExam() {
     document.getElementById('score-max').textContent='dari skor maksimal 550';
     document.getElementById('skd-breakdown').style.display='block';
     document.getElementById('skb-info').style.display='none';
+    document.getElementById('english-info').style.display='none';
 
     document.getElementById('skd-cards').innerHTML=[
       {k:'TWK',name:'Tes Wawasan Kebangsaan',   color:'#003580'},
@@ -1770,13 +2071,44 @@ function submitExam() {
       :'Satu atau lebih subtes belum mencapai passing grade. Terus berlatih!';
     document.getElementById('overall-status-title').style.color=lulusAll?'var(--green)':'var(--red)';
 
+  } else if (et === 'english_errorrec' || et === 'english_readcomp') {
+    // ── ENGLISH TEST RESULT ──────────────────────────────────
+    let totalBenar = 0;
+    qs.forEach((q,i) => { if (ua[i] === q.kunciJawaban) totalBenar++; });
+    const totalSkor = totalBenar * 5;
+    const skorMaks  = qs.length * 5;
+    const persen    = qs.length > 0 ? Math.round((totalBenar / qs.length) * 100) : 0;
+    const label     = EXAM_CFG[et]?.label || 'English Test';
+
+    document.getElementById('total-score').textContent = totalSkor;
+    document.getElementById('score-max').textContent   = `dari skor maksimal ${skorMaks} · ${totalBenar}/${qs.length} benar (${persen}%)`;
+    document.getElementById('skd-breakdown').style.display = 'none';
+    document.getElementById('skb-info').style.display      = 'none';
+    document.getElementById('english-info').style.display  = 'block';
+
+    // Tentukan level kemampuan
+    let level, levelColor, levelDesc;
+    if (persen >= 85)      { level='Excellent 🌟'; levelColor='var(--green)';  levelDesc='Kemampuan sangat baik. Siap menghadapi tes BUMN sesungguhnya.'; }
+    else if (persen >= 70) { level='Good 👍';       levelColor='var(--blue2)'; levelDesc='Kemampuan baik. Tingkatkan sedikit lagi untuk hasil optimal.'; }
+    else if (persen >= 55) { level='Fair ✏️';       levelColor='var(--yellow)';levelDesc='Kemampuan cukup. Perlu latihan lebih banyak di materi yang lemah.'; }
+    else                   { level='Need Practice 📚'; levelColor='var(--red)'; levelDesc='Perlu latihan intensif. Fokus pada materi dasar grammar dan reading.'; }
+
+    document.getElementById('english-level-badge').textContent  = level;
+    document.getElementById('english-level-badge').style.color  = levelColor;
+    document.getElementById('english-level-desc').textContent   = levelDesc;
+    document.getElementById('english-test-label').textContent   = `${label} — English Proficiency Test BUMN 2025`;
+
+    saveToLeaderboard('english', totalSkor, { subtest: et });
+
   } else {
+    // ── SKB RESULT ───────────────────────────────────────────
     let total=0;
     qs.forEach((q,i)=>{ if(ua[i]===q.kunciJawaban) total+=5; });
     document.getElementById('total-score').textContent=total;
     document.getElementById('score-max').textContent=`dari skor maksimal ${qs.length*5} (${qs.length} soal dikerjakan)`;
     document.getElementById('skd-breakdown').style.display='none';
     document.getElementById('skb-info').style.display='block';
+    document.getElementById('english-info').style.display='none';
     saveToLeaderboard('skb', total, {});
 
     const namaProdi = EXAM_CFG.skb?.prodiLabel || 'SKB';
@@ -1837,7 +2169,13 @@ function submitExam() {
   lbBtn.className = 'btn-back-menu btn-lb-hasil';
   lbBtn.style.cssText = 'background:linear-gradient(135deg,var(--green),#27ae60);margin-bottom:10px';
   lbBtn.textContent = '🏆 Lihat Papan Peringkat';
-  lbBtn.onclick = () => { lbCurrentTab = S.examType; showView('leaderboard'); };
+  lbBtn.onclick = () => {
+    // English subtypes → tab 'english', lainnya pakai examType langsung
+    const lbTab = (S.examType === 'english_errorrec' || S.examType === 'english_readcomp')
+      ? 'english' : S.examType;
+    lbCurrentTab = lbTab;
+    showView('leaderboard');
+  };
   reviewSec.parentNode.insertBefore(lbBtn, reviewSec);
 
   document.getElementById('view-ujian').classList.remove('view-ujian-active');
