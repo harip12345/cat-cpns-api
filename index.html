@@ -1626,14 +1626,19 @@ function setLoadingMsg(msg) {
 // =============================================================
 async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
   const controller = new AbortController();
-  const timeout = forceNew ? 55000 : 15000; // DB fetch: 15 detik (cukup untuk load parallel)
+  const timeout = forceNew ? 55000 : 15000;
   const timer   = setTimeout(() => controller.abort(), timeout);
+
+  // Normalisasi examType — API hanya mengenal 'skd', 'skb', 'english'
+  // english_errorrec / english_readcomp → 'english'
+  const apiExamType = (examType === 'english_errorrec' || examType === 'english_readcomp')
+    ? 'english' : examType;
 
   try {
     const res = await fetch(BASE_URL + '/api/soal', {
       method:  'POST',
       headers: { 'Content-Type':'application/json' },
-      body:    JSON.stringify({ examType, subtest, count, batchIndex, forceNew }),
+      body:    JSON.stringify({ examType: apiExamType, subtest, count, batchIndex, forceNew }),
       signal:  controller.signal,
     });
     clearTimeout(timer);
