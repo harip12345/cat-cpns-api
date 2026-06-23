@@ -236,88 +236,117 @@ Output HANYA array JSON valid (tanpa markdown, tanpa komentar, tanpa teks lain):
 "referensi":"UU/PerMenSos/PP yang spesifik dan masih berlaku",
 "nilai":{"benar":5,"salah":0}}]`,
 
-  ERRORREC: `You are a senior English language test specialist designing Structure & Written Expression questions for the Indonesian BUMN (State-Owned Enterprises) Joint Recruitment Test 2025, following the TOEFL ITP / BUMN English proficiency test format.
+  ERRORREC: `You are an expert English test item writer for the BUMN Joint Recruitment Test 2025 (Indonesia), specializing in Structure & Written Expression following the TOEFL ITP format.
 
-THIS SECTION HAS TWO DISTINCT QUESTION TYPES. Each batch must contain BOTH types in this exact proportion:
-- STRUCTURE questions: 15 out of 40 (first 15 questions, id 1–15)
-- WRITTEN EXPRESSION questions: 25 out of 40 (questions 16–40)
+CRITICAL: THIS SECTION HAS EXACTLY TWO COMPLETELY DIFFERENT QUESTION FORMATS. You MUST follow each format with zero deviation.
 
-━━━ PART 1: STRUCTURE (Questions 1–15) ━━━
-FORMAT: An incomplete English sentence with ONE blank. Choose the option (A, B, C, D) that BEST completes the sentence grammatically and meaningfully.
-Sentences must be complex/compound — not simple one-clause sentences.
-Contexts: corporate governance, BUMN operations, Indonesian business law, financial reporting, HR management.
+════════════════════════════════════════════════
+PART 1 — STRUCTURE (soal id 1–15, total 15 soal)
+════════════════════════════════════════════════
+PURPOSE: Test whether the candidate can choose the correct word/phrase to COMPLETE an incomplete sentence.
 
-STRUCTURE TOPICS TO COVER (rotate strictly):
-1. Subordinate clauses — relative clauses (who/which/that/whose), noun clauses (that/whether/wh-), adverb clauses (although/because/since/while/unless)
-2. Gerund vs infinitive as subject or object — "Swimming is..." / "It is difficult to..."
-3. Passive voice — simple, progressive, perfect forms
-4. Inversion — "Not only did... but also", "Seldom has...", "No sooner had... than"
-5. Parallel structure — correlative conjunctions (both...and, not only...but also, either...or)
-6. Conditional sentences — Type 1, 2, 3, mixed
-7. Comparatives & superlatives — "the more... the more", "as... as", "no less... than"
-8. Participle phrases — "Having completed...", "Being appointed...", "Known for..."
-9. Causative verbs — "have/make/let/get + object + verb form"
-10. Article usage with abstract/proper/uncountable nouns in formal contexts
+FORMAT RULES (NON-NEGOTIABLE):
+1. Write ONE incomplete sentence containing exactly ONE blank shown as: _____
+2. The blank replaces a STRUCTURAL ELEMENT (connector, clause opener, verb form, etc.)
+3. The four options (A, B, C, D) are SHORT words or phrases (1–5 words each)
+4. Exactly ONE option correctly completes the sentence — the other three are grammatically wrong IN THIS SPECIFIC SENTENCE CONTEXT
+5. The completed sentence (with correct answer inserted) must be 100% grammatically correct
+6. VERIFY: Insert each option into the blank and confirm only the correct one produces a valid sentence
 
-STRUCTURE DISTRACTOR RULES:
-- All 4 options must be grammatically plausible at first glance.
-- Wrong options must represent the most common student errors (e.g. wrong tense, wrong connector, gerund vs infinitive swap).
-- The correct answer is the ONLY one that completes the sentence with perfect grammar AND meaning.
+STRUCTURE — TOPICS TO ROTATE (one per question, no repeats in a batch):
+1. Relative clause opener: who / which / that / whose / whom
+2. Subordinating conjunction: although / because / since / while / unless / as long as
+3. Gerund vs infinitive: completing vs to complete / being vs to be
+4. Passive voice form: has been approved / was being reviewed / will have been submitted
+5. Inversion after negative adverb: Not only did... / Seldom has... / No sooner had...
+6. Correlative conjunction: both...and / not only...but also / either...or / neither...nor
+7. Conditional verb form: had submitted / would have been / were to announce
+8. Participle phrase opener: Having completed / Being appointed / Known for / Faced with
+9. Causative structure: have the report reviewed / get the team to submit / make employees comply
+10. Comparison structure: the more efficiently / as crucial as / no less important than
 
-━━━ PART 2: WRITTEN EXPRESSION (Questions 16–40) ━━━
-FORMAT: A complete English sentence with FOUR underlined parts labeled (A), (B), (C), (D). Exactly ONE underlined part contains a grammatical error. The candidate identifies which part (A/B/C/D) is incorrect.
-Sentences must be contextually relevant to professional/business/BUMN settings.
+STRUCTURE — DISTRACTOR RULES:
+- Option A must look tempting (e.g. similar word, wrong form)
+- Options B, C, D each represent a different common mistake
+- NEVER make all wrong options obviously wrong — each distractor must seem plausible at first glance
 
-WRITTEN EXPRESSION ERROR TYPES (rotate strictly, no repetition within a batch):
-1. Subject-verb agreement (collective nouns, indefinite pronouns, inverted sentences)
-2. Verb tense (wrong tense, tense inconsistency, sequence of tenses)
-3. Word form (noun/verb/adjective/adverb confusion — "economy" vs "economic" vs "economical")
-4. Pronoun case / antecedent disagreement
-5. Article errors (a/an/the with countable, uncountable, proper nouns)
-6. Preposition in fixed expressions ("responsible for" not "responsible of")
-7. Parallel structure in lists or comparisons
-8. Adjective vs adverb confusion ("good/well", "hard/hardly", comparatives)
-9. Conditional verb form errors (Type 1, 2, 3)
-10. Gerund vs infinitive after specific verbs ("avoid doing", "suggest doing", "decide to")
-11. Passive voice errors (wrong auxiliary or past participle)
-12. Redundancy / double negation
+STRUCTURE EXAMPLE (follow this format exactly):
+{
+  "id": 1,
+  "subtest": "ERRORREC",
+  "subtestFull": "Structure & Written Expression",
+  "tipe": "pilihan_ganda",
+  "questionPart": "Structure",
+  "grammarTopic": "Relative Clause — Subject Pronoun",
+  "text": "The regional director, _____ has managed the East Java division for six years, was recently promoted to the national board.",
+  "options": {"A": "who", "B": "which", "C": "whom", "D": "whose"},
+  "kunciJawaban": "A",
+  "pembahasanSingkat": "CORRECT: 'who' — relative pronoun for people, used as SUBJECT of the relative clause ('has managed'). WRONG: 'which' is for things/animals. 'whom' is object case. 'whose' shows possession.",
+  "nilai": {"benar": 5, "salah": 0}
+}
 
-WRITTEN EXPRESSION RULES:
-- The THREE correct underlined parts must be GRAMMATICALLY PERFECT — no ambiguity.
-- Error must be CLEAR and UNAMBIGUOUS.
-- Distribute error positions (A/B/C/D) evenly across the batch.
-- B2–C1 difficulty level.
+════════════════════════════════════════════════
+PART 2 — WRITTEN EXPRESSION (soal id 16–40, total 25 soal)
+════════════════════════════════════════════════
+PURPOSE: Test whether the candidate can IDENTIFY the grammatically incorrect part of a complete sentence.
 
-GLOBAL STRICT RULES:
-- NEVER repeat the same grammar topic in the same batch.
-- All sentences must be at B2–C1 level.
-- Contexts: corporate communication, BUMN policy, finance, HR, infrastructure, national development.
-- Generate exactly the number of questions requested (count field from user).
+FORMAT RULES (NON-NEGOTIABLE):
+1. Write ONE complete, meaningful sentence — NOT a sentence with a blank
+2. The sentence must have EXACTLY FOUR parts labeled (A), (B), (C), (D) embedded within it
+3. The labels appear INSIDE the sentence text like this: "The committee (A) has approved (B) the revised budget (C) despite strong opposition (D) from several departments."
+4. The four options list the TEXT of each labeled part: A="has approved", B="the revised budget", etc.
+5. Exactly ONE part contains a grammatical error
+6. The other THREE parts must be 100% grammatically correct — no ambiguity allowed
+7. VERIFY: Confirm the sentence makes complete sense with the three correct parts, and that fixing the error part produces a perfect sentence
 
-Output ONLY a valid JSON array (no markdown, no comments, no other text).
-Use this schema — include "questionPart" field to distinguish the two types:
+WRITTEN EXPRESSION — ERROR TYPES TO ROTATE (one per question, no repeats):
+1. Subject-verb agreement (collective noun treated as plural, indefinite pronoun mismatch)
+2. Wrong verb tense (past simple vs past perfect, present vs past in reported speech)
+3. Wrong word form (economic/economical/economy, solve/solution/solvent)
+4. Wrong pronoun case (he/him, they/them, who/whom)
+5. Wrong article (missing 'the' before superlative, 'a' before vowel sound, unnecessary article)
+6. Wrong preposition in fixed phrase (interested on → in, responsible of → for, agree with → to)
+7. Non-parallel structure in list (managing, to oversee, coordinates → all should be same form)
+8. Adjective used instead of adverb (performed good → well, works efficient → efficiently)
+9. Wrong conditional verb form (If he would come → came, if they will agree → agree)
+10. Gerund/infinitive error after specific verb (avoid to do → doing, suggest to hire → hiring)
+11. Wrong passive construction (was submitted by → was submitted to, has been approve → approved)
+12. Double negative or redundancy (cannot hardly → can hardly, more superior → superior)
 
-For STRUCTURE questions (id 1–15):
-{"id":1,"subtest":"ERRORREC","subtestFull":"Structure & Written Expression","tipe":"pilihan_ganda",
-"questionPart":"Structure",
-"tingkatKesulitan":"sedang",
-"grammarTopic":"brief topic label (e.g. Subordinate Clause — Relative Clause)",
-"text":"The regional manager, _____ has overseen the East Java division for five years, was promoted to national director last quarter.",
-"options":{"A":"who","B":"which","C":"whom","D":"whose"},
-"kunciJawaban":"A",
-"pembahasanSingkat":"'Who' is correct because the relative clause modifies 'the regional manager', a person, used as the subject of the clause ('has overseen'). 'Which' is for things, 'whom' is object case, 'whose' shows possession.",
-"nilai":{"benar":5,"salah":0}}
+WRITTEN EXPRESSION EXAMPLE (follow this format exactly):
+{
+  "id": 16,
+  "subtest": "ERRORREC",
+  "subtestFull": "Structure & Written Expression",
+  "tipe": "pilihan_ganda",
+  "questionPart": "Written Expression",
+  "errorType": "Subject-Verb Agreement — Collective Noun",
+  "text": "The board of directors (A) have approved (B) the revised annual budget (C) after three rounds (D) of intensive negotiation.",
+  "options": {"A": "The board of directors", "B": "have approved", "C": "the revised annual budget", "D": "after three rounds"},
+  "kunciJawaban": "B",
+  "pembahasanSingkat": "ERROR in (B): 'The board of directors' is a collective noun treated as SINGULAR in formal written English, so the correct verb is 'has approved', not 'have approved'. Parts (A), (C), (D) are grammatically correct.",
+  "nilai": {"benar": 5, "salah": 0}
+}
 
-For WRITTEN EXPRESSION questions (id 16–40):
-{"id":16,"subtest":"ERRORREC","subtestFull":"Structure & Written Expression","tipe":"pilihan_ganda",
-"questionPart":"Written Expression",
-"tingkatKesulitan":"sedang",
-"errorType":"brief error type label (e.g. Subject-Verb Agreement)",
-"text":"The board of directors (A) have decided to postpone (B) the annual general meeting (C) until a new venue (D) is confirmed.",
-"options":{"A":"The board of directors","B":"have decided to postpone","C":"the annual general meeting","D":"is confirmed"},
-"kunciJawaban":"B",
-"pembahasanSingkat":"'The board of directors' is a collective noun treated as singular in formal contexts. Correct form is 'has decided', not 'have decided'. Error is in (B).",
-"nilai":{"benar":5,"salah":0}}`,
+════════════════════════════════════════════════
+ABSOLUTE RULES FOR BOTH PARTS
+════════════════════════════════════════════════
+1. SELF-CHECK BEFORE OUTPUTTING each question:
+   - Structure: Insert correct answer into blank → is the sentence 100% grammatical? YES/NO
+   - Written Expression: Is the sentence complete (no blanks)? Is exactly ONE part wrong? Are the other 3 parts clearly correct?
+   - If NO to any check → rewrite the question entirely
+
+2. CONTEXT: All sentences must relate to Indonesian business/BUMN/corporate/government contexts
+
+3. DIFFICULTY: B2–C1 level (upper-intermediate to advanced)
+
+4. ANTI-REPETITION: No two questions in the same batch may test the same grammar point
+
+5. DISTRIBUTION: Spread error positions (A/B/C/D) evenly across Written Expression questions
+
+6. DO NOT mix the two formats — a Structure question must have a blank (_____), a Written Expression question must NOT have a blank
+
+Output ONLY a valid JSON array. No markdown, no comments, no extra text. Generate the full requested count split 15 Structure + 25 Written Expression per full batch of 40.`,
 
   READCOMP: `You are a senior English language test specialist designing Reading Comprehension questions for the Indonesian BUMN (State-Owned Enterprises) Joint Recruitment Test 2025.
 
