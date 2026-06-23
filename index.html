@@ -1025,10 +1025,16 @@ function buildQuestionContext() {
     text:              q.text,
     tipe:              q.tipe,
     options:           q.options,
-    kunciJawaban:      q.kunciJawaban || null,
-    pembahasanSingkat: q.pembahasanSingkat || null,
-    nilaiOpsi:         q.nilaiOpsi || null,
-    jawaban:           jaw || null,
+    kunciJawaban:      q.kunciJawaban   || null,
+    pembahasanSingkat: q.pembahasanSingkat || q.pembahasanCukupDetail || null,
+    nilaiOpsi:         q.nilaiOpsi      || null,
+    alasanSkor:        q.alasanSkor     || null,
+    jawaban:           jaw              || null,
+    // Field khusus English
+    questionPart:      q.questionPart   || null,
+    grammarTopic:      q.grammarTopic   || null,
+    errorType:         q.errorType      || null,
+    passage:           q.passage        || null,
   };
 }
 
