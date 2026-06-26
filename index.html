@@ -1706,15 +1706,41 @@ async function fetchSoal(examType, subtest, count, batchIndex, forceNew) {
   const timer   = setTimeout(() => controller.abort(), timeout);
 
   // Normalisasi examType — API hanya mengenal 'skd', 'skb', 'english'
-  // english_errorrec / english_readcomp → 'english'
   const apiExamType = (examType === 'english_errorrec' || examType === 'english_readcomp')
     ? 'english' : examType;
+
+  // Untuk ERRORREC: tentukan tipe soal per batch
+  // Total 40 soal: Structure soal 1-15 (batch 0: 10 soal, batch 1: 5 soal)
+  //                Written Expression soal 16-40 (batch 1 sisa, batch 2, batch 3)
+  // Lebih simpel: kirim questionPart & count eksplisit per batch
+  let questionPartConfig = null;
+  if (subtest === 'ERRORREC') {
+    const startSoal = batchIndex * 10 + 1; // soal mulai di batch ini
+    const endSoal   = startSoal + count - 1;
+    // Soal 1-15 = Structure, soal 16-40 = Written Expression
+    if (endSoal <= 15) {
+      // Seluruh batch ini Structure
+      questionPartConfig = { part: 'Structure', structureCount: count, writtenCount: 0 };
+    } else if (startSoal > 15) {
+      // Seluruh batch ini Written Expression
+      questionPartConfig = { part: 'WrittenExpression', structureCount: 0, writtenCount: count };
+    } else {
+      // Batch ini campuran (misal batch 1: soal 11-20, Structure 5 + Written 5)
+      const structureCount = 15 - startSoal + 1;
+      const writtenCount   = count - structureCount;
+      questionPartConfig = { part: 'Mixed', structureCount, writtenCount };
+    }
+  }
 
   try {
     const res = await fetch(BASE_URL + '/api/soal', {
       method:  'POST',
       headers: { 'Content-Type':'application/json' },
-      body:    JSON.stringify({ examType: apiExamType, subtest, count, batchIndex, forceNew }),
+      body:    JSON.stringify({
+        examType: apiExamType,
+        subtest, count, batchIndex, forceNew,
+        questionPartConfig, // null untuk non-ERRORREC
+      }),
       signal:  controller.signal,
     });
     clearTimeout(timer);
