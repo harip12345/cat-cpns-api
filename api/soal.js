@@ -500,7 +500,7 @@ function parseJSON(raw) {
 }
 
 // ─── Generate dengan model fallback ───────────────────────────
-async function generate(groq, subtest, count, batchIndex) {
+async function generate(groq, subtest, count, batchIndex, questionPartConfig=null) {
   const models = process.env.GROQ_MODEL
     ? [process.env.GROQ_MODEL, ...MODELS.filter(m=>m!==process.env.GROQ_MODEL)]
     : MODELS;
@@ -509,7 +509,43 @@ async function generate(groq, subtest, count, batchIndex) {
     ? `\nPENTING: Ini adalah batch ke-${batchIndex+1}. Buat soal dengan topik dan konteks yang BERBEDA TOTAL dari batch sebelumnya. Jangan ulangi konsep, tokoh, pasal, atau angka yang sudah pernah digunakan.`
     : '\nPENTING: Variasikan topik setiap soal. Tidak ada dua soal dengan konsep yang sama.';
 
-  const userPrompt = `Buat tepat ${count} soal ${subtest} tingkat EXPERT/SANGAT SULIT untuk seleksi CPNS 2024-2025.${antiRepeat}\nOutput HANYA array JSON valid langsung tanpa teks pembuka atau penutup.`;
+  // Untuk ERRORREC: tentukan instruksi spesifik berdasarkan questionPartConfig
+  let userPrompt;
+  if (subtest === 'ERRORREC' && questionPartConfig) {
+    const { part, structureCount, writtenCount } = questionPartConfig;
+
+    if (part === 'Structure') {
+      userPrompt = `Generate exactly ${count} STRUCTURE questions (sentence completion with blank _____) for the Structure & Written Expression section of the BUMN English Proficiency Test 2025.${antiRepeat}
+
+IMPORTANT: Generate ONLY Structure questions (Part 1 format with blank _____).
+DO NOT generate any Written Expression questions in this batch.
+All ${count} questions must follow the STRUCTURE format exactly as specified in your instructions.
+Output ONLY a valid JSON array.`;
+
+    } else if (part === 'WrittenExpression') {
+      userPrompt = `Generate exactly ${count} WRITTEN EXPRESSION questions (find the grammatical error in underlined parts A/B/C/D) for the Structure & Written Expression section of the BUMN English Proficiency Test 2025.${antiRepeat}
+
+IMPORTANT: Generate ONLY Written Expression questions (Part 2 format — complete sentences with labeled parts (A)(B)(C)(D)).
+DO NOT generate any Structure/sentence completion questions in this batch.
+Each sentence must be COMPLETE with NO blanks.
+All ${count} questions must follow the WRITTEN EXPRESSION format exactly as specified.
+Output ONLY a valid JSON array.`;
+
+    } else {
+      // Mixed batch (batch yang mencakup peralihan Structure→Written Expression)
+      userPrompt = `Generate exactly ${count} questions for the Structure & Written Expression section of the BUMN English Proficiency Test 2025.${antiRepeat}
+
+CRITICAL SPLIT: This batch must contain EXACTLY:
+- ${structureCount} STRUCTURE questions (sentence completion with blank _____) — these come FIRST in the array
+- ${writtenCount} WRITTEN EXPRESSION questions (complete sentence, find error in A/B/C/D) — these come LAST in the array
+
+DO NOT mix up the formats. Structure questions have blanks. Written Expression questions are complete sentences with labeled parts.
+Output ONLY a valid JSON array with ${structureCount} Structure questions first, then ${writtenCount} Written Expression questions.`;
+    }
+  } else {
+    // Prompt standar untuk subtest lain
+    userPrompt = `Buat tepat ${count} soal ${subtest} tingkat EXPERT/SANGAT SULIT untuk seleksi CPNS 2024-2025.${antiRepeat}\nOutput HANYA array JSON valid langsung tanpa teks pembuka atau penutup.`;
+  }
 
   let lastErr = null;
   for (const model of models) {
@@ -545,10 +581,10 @@ module.exports = async function handler(req, res) {
   if (req.method==='OPTIONS') return res.status(204).end();
   if (req.method!=='POST') return res.status(405).json({success:false,error:'Gunakan POST.'});
 
-  const { examType, subtest, count:cRaw, batchIndex=0, forceNew=false } = req.body||{};
+  const { examType, subtest, count:cRaw, batchIndex=0, forceNew=false, questionPartConfig=null } = req.body||{};
   const type  = (examType||'').toLowerCase();
   const sub   = (subtest||'').toUpperCase();
-  const count = Math.min(15, Math.max(1, parseInt(cRaw||'10',10)));
+  const count = Math.min(25, Math.max(1, parseInt(cRaw||'10',10)));
   const bIdx  = parseInt(batchIndex)||0;
 
   if (!VALID[type])                return res.status(400).json({success:false,error:'"examType" harus "skd"/"skb"/"english".'});
@@ -576,7 +612,7 @@ module.exports = async function handler(req, res) {
   // ── Generate dari Groq ─────────────────────────────────────
   try {
     const groq = new Groq({ apiKey });
-    const { questions, model } = await generate(groq, sub, count, bIdx);
+    const { questions, model } = await generate(groq, sub, count, bIdx, questionPartConfig);
 
     questions.forEach((q,i) => {
       q.id    = i + 1;
